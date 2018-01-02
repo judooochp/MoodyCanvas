@@ -1,0 +1,455 @@
+<html>
+    <head>
+        <title>Verification for {{ plate.cust_id }} Plate no. {{ plate.plate_id }}</title>
+        <style>
+            <!--
+            body {
+                color: #333;
+                background-color: #ddd;
+                text-align: center;
+                vertical-align: middle;
+                font-family: sans-serif;
+                font-size: 14px;
+            }
+
+            h1 {
+                font-family: Courier New, Courier, monospace;
+                font-size: 28pt;
+            }
+
+            a, a:visited, a:active {
+                color: #500;
+                text-decoration: none;
+            }
+
+                a:hover {
+                    text-decoration: underline;
+                }
+
+            ul, li {
+                list-style-type: none;
+                list-style-position: inside;
+                padding: 0;
+                margin: 0;
+            }
+
+            #footer {
+                right: 0;
+                left: 0;
+                text-align: center;
+                font-family: Courier New, Courier, monospace;
+                font-size: 12px;
+                padding-bottom: 5px;
+                margin-top: 20px;
+            }
+            input {
+                width: 50px;
+                
+            }
+            .block_wrap {
+                display: inline-block;
+                margin-right: 50px;
+            }
+            .labels {
+                display: inline-block;
+                margin-right: 10px;
+                text-align: right;
+            }
+            .inputs {
+                display: inline-block;
+                text-align: left;
+            }
+            .labels > span {
+                display: inline-block;
+                height: 21px;
+            }
+            .inputs > input {
+                display: inline-block;
+                height: 21px;
+            }
+            input:read-only {
+                background-color: lightgrey;
+            }
+            #lines div {
+                display: inline-block;
+                vertical-align: top;
+            }
+            .profile {
+                text-align: right;
+                padding-left: 15px;
+            }
+            img {
+                width: 200px;
+            }
+            #warning {
+                display: none;
+            }
+            -->
+        </style>
+    </head>
+    <body>
+
+        <!--
+            Improvements to be made:
+                -show only one line at a time
+                -three collapse to the one averaged input, then bring up next line
+        -->
+    {% if not plate %}
+    <h2>Entered Plate does not exist.</h2>
+    {% else %}
+        <h2>Verification</h2>
+
+        <h3>Plate Info:</h3>
+        <p>
+            <div style="display: inline-block; margin-right: 50px;">
+                <div style="display: inline-block; margin-right: 10px; text-align: right;">
+                    <span>Manufacturer:</span><br />
+                    <span>Serial No.:</span>
+                </div>
+                <div style="display: inline-block; text-align: left;">
+                    <span>{{ plate.plate_mfr }}</span><br />
+                    <span>{{ plate.plate_sn }}</span>
+                </div>
+            </div>
+            <div style="display: inline-block; margin-right: 50px;">
+                <div style="display: inline-block; margin-right: 10px; text-align: right;">
+                    <span>Width:</span><br />
+                    <span>Length:</span>
+                </div>
+                <div style="display: inline-block; text-align: left;">
+                    <span>{{ plate.plate_wid }}</span><br />
+                    <span>{{ plate.plate_len }}</span>
+                </div>
+            </div>
+        </p>
+    <h3>Setup:</h3>
+        <form action="{% url 'Moody:save_new_verif' plate.cust_id plate.plate_id %}" method="post" onsubmit="return validateSubmit()">
+            {% csrf_token %}
+            <p>
+                <span id="warning" style="color: #800;">Only edit Margins and Footspacing if you're sure you know what you're doing.</span>
+                <div id="block_wrap1" class="block_wrap">
+                    <div class="labels">
+                        <span>Certificate: </span><br />
+                        <span>Technician: </span><br />
+                        <span>Run Description: </span><br />
+                        <span>Top Temperature &deg;F: </span><br />
+                        <span>Bottom Temperature &deg;F: </span><br />
+                        <span>Ambient Start Temp &deg;F: </span><br />
+                    </div>
+                    <div class="inputs">
+                        <input id="cert_no" name="cert_no" type="text" style="width: 150px;" value="" onchange="next()" /><br />
+                        <input id="tech_name" name="tech_name" type="text" style="width: 150px;" value="" onchange="next()" /><br />
+                        <input id="run_descr" name="run_descr" type="text" style="width: 150px;" value="" onchange="next()" placeholder="As Found" /><br />
+                        <input id="top_temp" name="top_temp" type="number" step="0.01" value="" onchange="next()" /><br />
+                        <input id="bot_temp" name="bot_temp" type="number" step="0.01" value="" onchange="next()" /><br />
+                        <input id="temp_start" name="temp_start" type="number" step="0.01" onchange="next()" /><br />
+                    </div>
+                </div>
+                <div id="block_wrap2" class="block_wrap">
+                    <div class="labels">
+                        <span>Margins (4 &amp; 6): </span><br />
+                        <span>(3 &amp; 5): </span><br />
+                        <span>Reference (North): </span><br />
+                        <span>Ambient End Temp &deg;F: </span><br />
+                        <span>Repeat Measurement &micro;in: </span><br />
+                        <span>Footspacing: </span><br />
+                    </div>
+                    <div class="inputs">
+                        <input id="margin_wid" name="margin_wid" type="number" step="0.1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" readonly /><br />
+                        <input id="margin_len" name="margin_len" type="number" step="0.1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" readonly /><br />
+                        <input id="ref_line" name="ref_line" type="number" step="1" value="" readonly /><br />
+                        <input id="temp_end" name="temp_end" type="number" step="0.01" readonly /><br />
+                        <input id="repeat" name="repeat" type="number" step="1" readonly /><br />
+                        <input id="foot_len" name="foot_len" type="number" step="1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" onchange="wid_meas(), len_meas(), diag_meas()" readonly /><br />
+                    </div>
+                    <input id="meas_along_len" name="meas_along_len" type="hidden" value="" />
+                    <input id="meas_along_wid" name="meas_along_wid" type="hidden" value="" />
+                    <input id="meas_along_diag" name="meas_along_diag" type="hidden" value="" />
+                </div>
+            </p>
+            <div id="lines">
+                <span>Enter ArcSeconds</span><br />
+                <div>Line Order:<br /><img alt="Line order" /></div>
+                <div><p id="profile_1" class="profile"></p></div>
+                <div><p id="profile_2" class="profile"></p></div>
+                <div><p id="profile_3" class="profile"></p></div>
+                <div><p id="profile_4" class="profile"></p></div>
+                <div><p id="profile_5" class="profile"></p></div>
+                <div><p id="profile_6" class="profile"></p></div>
+                <div><p id="profile_7" class="profile"></p></div>
+                <div><p id="profile_8" class="profile"></p></div>
+                <div></div>
+            </div>
+            <input id="submit" type="submit" style="width: 200px;" value="Send Measurements" />
+        </form>
+    <script>
+        <!--
+            window.onload = function () {
+                two_margins({{ plate.plate_wid }}, {{ plate.plate_len }}, 4),
+                wid_meas(),
+                len_meas(),
+                diag_meas(),
+                populate_table(),
+                populate_image()
+            }
+            function figure_margin(figure, foot_size) { //  Determine mathematically convenient margin
+                if (figure % 8 == 0) {
+                    return 4
+                } else {
+                    return Math.ceil(figure * .0334)
+                }
+            }
+            function two_margins(one, two, foot_size) {
+                document.getElementById("margin_len").value = figure_margin(one, foot_size);
+                document.getElementById("margin_wid").value = figure_margin(two, foot_size);
+            }
+            function wid_meas() {   //  Number of measurements for lines along width
+                var wid = {{ plate.plate_wid }};
+                var mar = document.getElementById("margin_len").value;
+                var foot = document.getElementById("foot_len").value;
+                var meas = Math.floor((((wid - (mar * 2)) / foot) / 2) + 0.5) * 2;
+                var input = document.getElementById("meas_along_wid");
+                input.value = meas;
+            }
+            function len_meas() {   //  Number of measurements for lines along length
+                var len = {{ plate.plate_len }};
+                var mar = document.getElementById("margin_wid").value;
+                var foot = document.getElementById("foot_len").value;
+                var meas = Math.floor(((len - mar * 2) / foot) / 2 + 0.5) * 2;
+                var input = document.getElementById("meas_along_len");
+                input.value = meas;
+            }
+            function diag_meas() {  //  Number of measurements for diagonal line
+                var foot = document.getElementById("foot_len").value;
+                var wid = {{ plate.plate_wid }};
+                var len = {{ plate.plate_len }};
+                var mar_wid = document.getElementById("margin_wid").value;
+                var mar_len = document.getElementById("margin_len").value;
+                var inches = Math.sqrt(Math.pow((len - (mar_wid * 2)), 2) + Math.pow((wid - (mar_len * 2)), 2)).toFixed(3);
+                var meas = Math.floor((inches / foot) / 2 + 0.5) * 2;
+                var input = document.getElementById("meas_along_diag");
+                input.value = meas;
+            }
+            function populate_table() { //  Generate inputs based on wid_meas, etc.
+                //  Profile 1
+                var diag = parseInt(document.getElementById("meas_along_diag").value);
+                var len = parseInt(document.getElementById("meas_along_len").value);
+                var wid = parseInt(document.getElementById("meas_along_wid").value);
+                var profile1 = document.getElementById("profile_1");
+                var head = document.createElement("span");
+                head.innerHTML = "Line 1";
+                profile1.appendChild(head);
+                var br = document.createElement("br");
+                profile1.appendChild(br);
+                for (var i = 0; i < diag; i++) {
+                    var span = document.createElement("span");
+                    span.innerHTML = (i + 1).toString() + ": ";
+                    profile1.appendChild(span);
+                    var input = document.createElement("input");
+                    input.id = "meas_" + i;
+                    input.name = "meas_" + i;
+                    input.type = "number";
+                    input.step = "0.01";
+                    profile1.appendChild(input);
+                    br = document.createElement("br");
+                    profile1.appendChild(br);
+                }
+                //  Profile 2
+                var adder = diag;
+                var profile2 = document.getElementById("profile_2");
+                head = document.createElement("span");
+                head.innerHTML = "Line 2";
+                profile2.appendChild(head);
+                br = document.createElement("br");
+                profile2.appendChild(br);
+                for (var i = 0; i < diag; i++) {
+                    span = document.createElement("span");
+                    span.innerHTML = (i + 1 + adder) + ": ";
+                    profile2.appendChild(span);
+                    input = document.createElement("input");
+                    input.id = "meas_" + (i + adder);
+                    input.name = "meas_" + (i + adder);
+                    input.type = "number";
+                    input.step = "0.01";
+                    profile2.appendChild(input);
+                    br = document.createElement("br");
+                    profile2.appendChild(br);
+                }
+                //  Profile 3
+                adder += diag;
+                var profile3 = document.getElementById("profile_3");
+                head = document.createElement("span");
+                head.innerHTML = "Line 3";
+                profile3.appendChild(head);
+                br = document.createElement("br");
+                profile3.appendChild(br);
+                for (var i = 0; i < len; i++) {
+                    span = document.createElement("span");
+                    span.innerHTML = (i + 1 + adder) + ": ";
+                    profile3.appendChild(span);
+                    input = document.createElement("input");
+                    input.id = "meas_" + (i + adder);
+                    input.name = "meas_" + (i + adder);
+                    input.type = "number";
+                    input.step = "0.01";
+                    profile3.appendChild(input);
+                    br = document.createElement("br");
+                    profile3.appendChild(br);
+                }
+                //  Profile 4
+                adder += len;
+                var profile4 = document.getElementById("profile_4");
+                head = document.createElement("span");
+                head.innerHTML = "Line 4";
+                profile4.appendChild(head);
+                br = document.createElement("br");
+                profile4.appendChild(br);
+                for (var i = 0; i < wid; i++) {
+                    span = document.createElement("span");
+                    span.innerHTML = (i + 1 + adder) + ": ";
+                    profile4.appendChild(span);
+                    input = document.createElement("input");
+                    input.id = "meas_" + (i + adder);
+                    input.name = "meas_" + (i + adder);
+                    input.type = "number";
+                    input.step = "0.01";
+                    profile4.appendChild(input);
+                    br = document.createElement("br");
+                    profile4.appendChild(br);
+                }
+                //  Profile 5
+                adder += wid;
+                var profile5 = document.getElementById("profile_5");
+                head = document.createElement("span");
+                head.innerHTML = "Line 5";
+                profile5.appendChild(head);
+                br = document.createElement("br");
+                profile5.appendChild(br);
+                for (var i = 0; i < len; i++) {
+                    span = document.createElement("span");
+                    span.innerHTML = (i + 1 + adder) + ": ";
+                    profile5.appendChild(span);
+                    input = document.createElement("input");
+                    input.id = "meas_" + (i + adder);
+                    input.name = "meas_" + (i + adder);
+                    input.type = "number";
+                    input.step = "0.01";
+                    profile5.appendChild(input);
+                    br = document.createElement("br");
+                    profile5.appendChild(br);
+                }
+                //  Profile 6
+                adder += len;
+                var profile6 = document.getElementById("profile_6");
+                head = document.createElement("span");
+                head.innerHTML = "Line 6";
+                profile6.appendChild(head);
+                br = document.createElement("br");
+                profile6.appendChild(br);
+                for (var i = 0; i < wid; i++) {
+                    span = document.createElement("span");
+                    span.innerHTML = (i + 1 + adder) + ": ";
+                    profile6.appendChild(span);
+                    input = document.createElement("input");
+                    input.id = "meas_" + (i + adder);
+                    input.name = "meas_" + (i + adder);
+                    input.type = "number";
+                    input.step = "0.01";
+                    profile6.appendChild(input);
+                    br = document.createElement("br");
+                    profile6.appendChild(br);
+                }
+                //  Profile 7
+                adder += wid;
+                var profile7 = document.getElementById("profile_7");
+                head = document.createElement("span");
+                head.innerHTML = "Line 7";
+                profile7.appendChild(head);
+                br = document.createElement("br");
+                profile7.appendChild(br);
+                for (var i = 0; i < wid; i++) {
+                    span = document.createElement("span");
+                    span.innerHTML = (i + 1 + adder) + ": ";
+                    profile7.appendChild(span);
+                    input = document.createElement("input");
+                    input.id = "meas_" + (i + adder);
+                    input.name = "meas_" + (i + adder);
+                    input.type = "number";
+                    input.step = "0.01";
+                    profile7.appendChild(input);
+                    br = document.createElement("br");
+                    profile7.appendChild(br);
+                }
+                //  Profile 8
+                adder += wid;
+                var profile8 = document.getElementById("profile_8");
+                head = document.createElement("span");
+                head.innerHTML = "Line 8";
+                profile8.appendChild(head);
+                br = document.createElement("br");
+                profile8.appendChild(br);
+                for (var i = 0; i < len; i++) {
+                    span = document.createElement("span");
+                    span.innerHTML = (i + 1 + adder) + ": ";
+                    profile8.appendChild(span);
+                    input = document.createElement("input");
+                    input.id = "meas_" + (i + adder);
+                    input.name = "meas_" + (i + adder);
+                    input.type = "number";
+                    input.step = "0.01";
+                    profile8.appendChild(input);
+                    br = document.createElement("br");
+                    profile8.appendChild(br);
+                }
+                //  Update adder to send POST
+                adder += len;
+                var hidden = document.createElement("input");
+                hidden.id = "meas_total";
+                hidden.name = "meas_total";
+                hidden.type = "hidden";
+                hidden.value = adder;
+                profile8.appendChild(hidden);
+            }
+            function validateSubmit() {
+                //  check that all inputs are not empty
+                var inputs = document.getElementsByTagName("input");
+
+                for (var i = 0; i < inputs.length; i++) {
+                    if (inputs[i].value == "") {
+                        alert("Please be sure to fill out all fields.");
+                        return false;
+                    }
+                }
+            }
+            function next() {   //  Attempt to ensure procedure's process flow is followed.
+                var cert = document.getElementById('cert_no').value
+                var tech = document.getElementById('tech_name').value
+                var top = document.getElementById('top_temp').value
+                var bot = document.getElementById('bot_temp').value
+                var temp = document.getElementById('temp_start').value
+
+                if (cert != '' && tech != '' && top != '' && bot != '' && temp != '') {
+                    document.getElementById('margin_wid').removeAttribute('readonly');
+                    document.getElementById('margin_len').removeAttribute('readonly');
+                    document.getElementById('ref_line').removeAttribute('readonly');
+                    document.getElementById('temp_end').removeAttribute('readonly');
+                    document.getElementById('repeat').removeAttribute('readonly');
+                    document.getElementById('foot_len').removeAttribute('readonly');
+                }
+
+            }
+            function populate_image() { //  Django's static files system is wonky. This is my workaround.
+                image = document.getElementsByTagName('img');
+                image[0].src = 'data:image/png;base64,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';
+            }
+            function display_warning() {
+                document.getElementById('warning').style.display = 'inline';
+            }
+            function undisplay_warning() {
+                document.getElementById('warning').style.display = 'none';
+            }
+        -->
+    </script>
+    {% endif %}
+    </body>
+</html>
