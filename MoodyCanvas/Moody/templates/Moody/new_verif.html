@@ -1,187 +1,226 @@
 <html>
-    <head>
-        <title>Verification for {{ plate.cust_id }} Plate no. {{ plate.plate_id }}</title>
-        <style>
-            <!--
-            body {
-                color: #333;
-                background-color: #ddd;
-                text-align: center;
-                vertical-align: middle;
-                font-family: sans-serif;
-                font-size: 14px;
-            }
-
-            h1 {
-                font-family: Courier New, Courier, monospace;
-                font-size: 28pt;
-            }
-
-            a, a:visited, a:active {
-                color: #500;
-                text-decoration: none;
-            }
-
-                a:hover {
-                    text-decoration: underline;
-                }
-
-            ul, li {
-                list-style-type: none;
-                list-style-position: inside;
-                padding: 0;
-                margin: 0;
-            }
-
-            #footer {
-                right: 0;
-                left: 0;
-                text-align: center;
-                font-family: Courier New, Courier, monospace;
-                font-size: 12px;
-                padding-bottom: 5px;
-                margin-top: 20px;
-            }
-            input {
-                width: 50px;
-                
-            }
-            .block_wrap {
-                display: inline-block;
-                margin-right: 50px;
-            }
-            .labels {
-                display: inline-block;
-                margin-right: 10px;
-                text-align: right;
-            }
-            .inputs {
-                display: inline-block;
-                text-align: left;
-            }
-            .labels > span {
-                display: inline-block;
-                height: 21px;
-            }
-            .inputs > input {
-                display: inline-block;
-                height: 21px;
-            }
-            input:read-only {
-                background-color: lightgrey;
-            }
-            #lines div {
-                display: inline-block;
-                vertical-align: top;
-            }
-            .profile {
-                text-align: right;
-                padding-left: 15px;
-            }
-            img {
-                width: 200px;
-            }
-            #warning {
-                display: none;
-            }
-            -->
-        </style>
-    </head>
-    <body>
-
+<head>
+    <title>Verification for {{ plate.cust_id }} Plate no. {{ plate.plate_id }}</title>
+    <style>
         <!--
-            Improvements to be made:
-                -show only one line at a time
-                -three collapse to the one averaged input, then bring up next line
+        body {
+            color: #333;
+            background-color: #ddd;
+            text-align: center;
+            vertical-align: middle;
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+
+        h1 {
+            font-family: Courier New, Courier, monospace;
+            font-size: 28pt;
+        }
+
+        a, a:visited, a:active {
+            color: #500;
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+        ul, li {
+            list-style-type: none;
+            list-style-position: inside;
+            padding: 0;
+            margin: 0;
+        }
+
+        #footer {
+            right: 0;
+            left: 0;
+            text-align: center;
+            font-family: Courier New, Courier, monospace;
+            font-size: 12px;
+            padding-bottom: 5px;
+            margin-top: 20px;
+        }
+
+        input {
+            width: 50px;
+        }
+
+        .block_wrap {
+            display: inline-block;
+            margin-right: 50px;
+        }
+
+        .labels {
+            display: inline-block;
+            margin-right: 10px;
+            text-align: right;
+        }
+
+        .inputs {
+            display: inline-block;
+            text-align: left;
+        }
+
+        .labels > span {
+            display: inline-block;
+            height: 21px;
+        }
+
+        .inputs > input {
+            display: inline-block;
+            height: 21px;
+        }
+
+        input:read-only {
+            background-color: lightgrey;
+        }
+
+        #lines div {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .profile {
+            text-align: right;
+            padding-left: 15px;
+        }
+
+        img {
+            width: 200px;
+        }
+
+        #warning {
+            display: none;
+        }
+
+        #nav {
+            list-style-type: none;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+            #nav li {
+                list-style-type: none;
+                display: inline-block;
+            }
+
+        #header {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto;
+            text-align: center;
+            width: 60%;
+            border-bottom: 1px solid #444;
+        }
         -->
+    </style>
+</head>
+<body>
+    <div id="header">
+        <ul id="nav">
+            <li><a href="{% url 'home:index' %}" style="font-size: 18px; font-family: Courier New, Courier, monospace; margin-right: 50px;">Moody Canvas!</a></li>
+            <li><a rel="dead placeholder link">Procedure</a> &raquo;</li>
+            <li><a href="{% url 'Moody:index' %}">Home</a> &raquo;</li>
+            <li><a href="{% url 'Moody:customers' %}">Customers</a> &raquo;</li>
+            <li><a href="{% url 'Moody:plates' view.kwargs.custname %}">Plates</a> &raquo;</li>
+            <li><a href="{% url 'Moody:verifs' view.kwargs.custname view.kwargs.id_no %}">Verifications</a></li>
+        </ul>
+    </div>
+    <!--
+        Improvements to be made:
+            -show only one line at a time
+            -three collapse to the one averaged input, then bring up next line
+    -->
     {% if not plate %}
     <h2>Entered Plate does not exist.</h2>
     {% else %}
-        <h2>Verification</h2>
+    <h2>Verification</h2>
 
-        <h3>Plate Info:</h3>
+    <h3>Plate Info:</h3>
+    <p>
+        <div style="display: inline-block; margin-right: 50px;">
+            <div style="display: inline-block; margin-right: 10px; text-align: right;">
+                <span>Manufacturer:</span><br />
+                <span>Serial No.:</span>
+            </div>
+            <div style="display: inline-block; text-align: left;">
+                <span>{{ plate.plate_mfr }}</span><br />
+                <span>{{ plate.plate_sn }}</span>
+            </div>
+        </div>
+        <div style="display: inline-block; margin-right: 50px;">
+            <div style="display: inline-block; margin-right: 10px; text-align: right;">
+                <span>Width:</span><br />
+                <span>Length:</span>
+            </div>
+            <div style="display: inline-block; text-align: left;">
+                <span>{{ plate.plate_wid }}</span><br />
+                <span>{{ plate.plate_len }}</span>
+            </div>
+        </div>
+    </p>
+    <h3>Setup:</h3>
+    <form action="{% url 'Moody:save_new_verif' plate.cust_id plate.plate_id %}" method="post" onsubmit="return validateSubmit()">
+        {% csrf_token %}
         <p>
-            <div style="display: inline-block; margin-right: 50px;">
-                <div style="display: inline-block; margin-right: 10px; text-align: right;">
-                    <span>Manufacturer:</span><br />
-                    <span>Serial No.:</span>
+            <span id="warning" style="color: #800;">Only edit Margins and Footspacing if you're sure you know what you're doing.</span>
+            <div id="block_wrap1" class="block_wrap">
+                <div class="labels">
+                    <span>Certificate: </span><br />
+                    <span>Technician: </span><br />
+                    <span>Run Description: </span><br />
+                    <span>Top Temperature &deg;F: </span><br />
+                    <span>Bottom Temperature &deg;F: </span><br />
+                    <span>Ambient Start Temp &deg;F: </span><br />
                 </div>
-                <div style="display: inline-block; text-align: left;">
-                    <span>{{ plate.plate_mfr }}</span><br />
-                    <span>{{ plate.plate_sn }}</span>
+                <div class="inputs">
+                    <input id="cert_no" name="cert_no" type="text" style="width: 150px;" value="" onchange="next()" /><br />
+                    <input id="tech_name" name="tech_name" type="text" style="width: 150px;" value="" onchange="next()" /><br />
+                    <input id="run_descr" name="run_descr" type="text" style="width: 150px;" value="" onchange="next()" placeholder="As Found" /><br />
+                    <input id="top_temp" name="top_temp" type="number" step="0.01" value="" onchange="next()" /><br />
+                    <input id="bot_temp" name="bot_temp" type="number" step="0.01" value="" onchange="next()" /><br />
+                    <input id="temp_start" name="temp_start" type="number" step="0.01" onchange="next()" /><br />
                 </div>
             </div>
-            <div style="display: inline-block; margin-right: 50px;">
-                <div style="display: inline-block; margin-right: 10px; text-align: right;">
-                    <span>Width:</span><br />
-                    <span>Length:</span>
+            <div id="block_wrap2" class="block_wrap">
+                <div class="labels">
+                    <span>Margins (4 &amp; 6): </span><br />
+                    <span>(3 &amp; 5): </span><br />
+                    <span>Reference (North): </span><br />
+                    <span>Ambient End Temp &deg;F: </span><br />
+                    <span>Repeat Measurement &micro;in: </span><br />
+                    <span>Footspacing: </span><br />
                 </div>
-                <div style="display: inline-block; text-align: left;">
-                    <span>{{ plate.plate_wid }}</span><br />
-                    <span>{{ plate.plate_len }}</span>
+                <div class="inputs">
+                    <input id="margin_wid" name="margin_wid" type="number" step="0.1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" readonly /><br />
+                    <input id="margin_len" name="margin_len" type="number" step="0.1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" readonly /><br />
+                    <input id="ref_line" name="ref_line" type="number" step="1" value="" readonly /><br />
+                    <input id="temp_end" name="temp_end" type="number" step="0.01" readonly /><br />
+                    <input id="repeat" name="repeat" type="number" step="1" readonly /><br />
+                    <input id="foot_len" name="foot_len" type="number" step="1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" onchange="wid_meas(), len_meas(), diag_meas()" readonly /><br />
                 </div>
+                <input id="meas_along_len" name="meas_along_len" type="hidden" value="" />
+                <input id="meas_along_wid" name="meas_along_wid" type="hidden" value="" />
+                <input id="meas_along_diag" name="meas_along_diag" type="hidden" value="" />
             </div>
         </p>
-    <h3>Setup:</h3>
-        <form action="{% url 'Moody:save_new_verif' plate.cust_id plate.plate_id %}" method="post" onsubmit="return validateSubmit()">
-            {% csrf_token %}
-            <p>
-                <span id="warning" style="color: #800;">Only edit Margins and Footspacing if you're sure you know what you're doing.</span>
-                <div id="block_wrap1" class="block_wrap">
-                    <div class="labels">
-                        <span>Certificate: </span><br />
-                        <span>Technician: </span><br />
-                        <span>Run Description: </span><br />
-                        <span>Top Temperature &deg;F: </span><br />
-                        <span>Bottom Temperature &deg;F: </span><br />
-                        <span>Ambient Start Temp &deg;F: </span><br />
-                    </div>
-                    <div class="inputs">
-                        <input id="cert_no" name="cert_no" type="text" style="width: 150px;" value="" onchange="next()" /><br />
-                        <input id="tech_name" name="tech_name" type="text" style="width: 150px;" value="" onchange="next()" /><br />
-                        <input id="run_descr" name="run_descr" type="text" style="width: 150px;" value="" onchange="next()" placeholder="As Found" /><br />
-                        <input id="top_temp" name="top_temp" type="number" step="0.01" value="" onchange="next()" /><br />
-                        <input id="bot_temp" name="bot_temp" type="number" step="0.01" value="" onchange="next()" /><br />
-                        <input id="temp_start" name="temp_start" type="number" step="0.01" onchange="next()" /><br />
-                    </div>
-                </div>
-                <div id="block_wrap2" class="block_wrap">
-                    <div class="labels">
-                        <span>Margins (4 &amp; 6): </span><br />
-                        <span>(3 &amp; 5): </span><br />
-                        <span>Reference (North): </span><br />
-                        <span>Ambient End Temp &deg;F: </span><br />
-                        <span>Repeat Measurement &micro;in: </span><br />
-                        <span>Footspacing: </span><br />
-                    </div>
-                    <div class="inputs">
-                        <input id="margin_wid" name="margin_wid" type="number" step="0.1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" readonly /><br />
-                        <input id="margin_len" name="margin_len" type="number" step="0.1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" readonly /><br />
-                        <input id="ref_line" name="ref_line" type="number" step="1" value="" readonly /><br />
-                        <input id="temp_end" name="temp_end" type="number" step="0.01" readonly /><br />
-                        <input id="repeat" name="repeat" type="number" step="1" readonly /><br />
-                        <input id="foot_len" name="foot_len" type="number" step="1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" onchange="wid_meas(), len_meas(), diag_meas()" readonly /><br />
-                    </div>
-                    <input id="meas_along_len" name="meas_along_len" type="hidden" value="" />
-                    <input id="meas_along_wid" name="meas_along_wid" type="hidden" value="" />
-                    <input id="meas_along_diag" name="meas_along_diag" type="hidden" value="" />
-                </div>
-            </p>
-            <div id="lines">
-                <span>Enter ArcSeconds</span><br />
-                <div>Line Order:<br /><img alt="Line order" /></div>
-                <div><p id="profile_1" class="profile"></p></div>
-                <div><p id="profile_2" class="profile"></p></div>
-                <div><p id="profile_3" class="profile"></p></div>
-                <div><p id="profile_4" class="profile"></p></div>
-                <div><p id="profile_5" class="profile"></p></div>
-                <div><p id="profile_6" class="profile"></p></div>
-                <div><p id="profile_7" class="profile"></p></div>
-                <div><p id="profile_8" class="profile"></p></div>
-                <div></div>
-            </div>
-            <input id="submit" type="submit" style="width: 200px;" value="Send Measurements" />
-        </form>
+        <div id="lines">
+            <span>Enter ArcSeconds</span><br />
+            <div>Line Order:<br /><img alt="Line order" /></div>
+            <div><p id="profile_1" class="profile"></p></div>
+            <div><p id="profile_2" class="profile"></p></div>
+            <div><p id="profile_3" class="profile"></p></div>
+            <div><p id="profile_4" class="profile"></p></div>
+            <div><p id="profile_5" class="profile"></p></div>
+            <div><p id="profile_6" class="profile"></p></div>
+            <div><p id="profile_7" class="profile"></p></div>
+            <div><p id="profile_8" class="profile"></p></div>
+            <div></div>
+        </div>
+        <input id="submit" type="submit" style="width: 200px;" value="Send Measurements" />
+    </form>
     <script>
         <!--
             window.onload = function () {
@@ -451,5 +490,5 @@
         -->
     </script>
     {% endif %}
-    </body>
+</body>
 </html>

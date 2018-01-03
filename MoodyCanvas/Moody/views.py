@@ -157,10 +157,10 @@ def save_new_verif(request, custname, id_no):
     ]
     height_map = get_height_map(profiles, verif.verif_foot)
     verif_flatness = get_flatness(height_map)
-    verif.verif_grade = get_grade(verif_flatness, verif.verif_wid, verif.verif_len)
+    verif.verif_grade = get_grade(verif_flatness, verif.plate_id.plate_wid, verif.plate_id.plate_len)
     verif.verif_flat = verif_flatness
-    verif.clos_7 = get_closure(profile7_row_list)
-    verif.clos_8 = get_closure(profile8_row_list)
+    verif.clos_7 = get_closure(profiles[6])
+    verif.clos_8 = get_closure(profiles[7])
     verif.verif_min = get_min(profiles)
     verif.verif_max = get_max(profiles)
     verif.save()

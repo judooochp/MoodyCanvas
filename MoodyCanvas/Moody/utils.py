@@ -1,5 +1,4 @@
 import math
-import pdb
 
 #   Subtract first value from all the rest of the measurements.
 #   This eliminates a need to have the first measurement be zero.
@@ -113,7 +112,6 @@ def get_flatness(height_map):
 
 
 def grade(flat, grad):
-    pdb.set_trace()
     if flat <=  grad:
         return "AA"
     elif flat <=  grad * 2:

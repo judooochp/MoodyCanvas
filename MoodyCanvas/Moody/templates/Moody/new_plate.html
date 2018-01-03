@@ -44,12 +44,39 @@
             padding-bottom: 5px;
             margin-top: 20px;
         }
+
+        #nav {
+            list-style-type: none;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+            #nav li {
+                list-style-type: none;
+                display: inline-block;
+            }
+
+        #header {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto;
+            text-align: center;
+            width: 60%;
+            border-bottom: 1px solid #444;
+        }
         -->
     </style>
-
 </head>
 <body>
-    <h1>Moody Canvas!</h1>
+    <div id="header">
+        <ul id="nav">
+            <li><a href="{% url 'home:index' %}" style="font-size: 18px; font-family: Courier New, Courier, monospace; margin-right: 50px;">Moody Canvas!</a></li>
+            <li><a rel="dead placeholder link">Procedure</a> &raquo;</li>
+            <li><a href="{% url 'Moody:index' %}">Home</a> &raquo;</li>
+            <li><a href="{% url 'Moody:customers' %}">Customers</a> &raquo;</li>
+            <li><a href="{% url 'Moody:plates' cust %}">Plates</a></li>
+        </ul>
+    </div>
     {% if cust %}
     <h2>Add a New Plate for {{ cust }}</h2>
     <form action="{% url 'Moody:save_new_plate' cust %}" method="post">
@@ -70,7 +97,5 @@
         <a href="{% url 'Moody:customers' %}">Browse Customers</a>
     </p>
     {% endif %}
-
-    <div id="footer">created by Jacob Gilliam, 1Jan2017</div>
 </body>
 </html>
