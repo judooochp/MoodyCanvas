@@ -20,8 +20,9 @@ Improvements to be made:
   -Aesthetic design improvements  
   -Template standardization  
   -Lightbox warnings  
-  xMaking live on an actual server  
+  xMaking live on an actual server : http://138.197.70.142  
   -Addition of Planekator procedure/app  
   -Make useful for mobile interfaces  
+  -Improved workflow control
 
   
