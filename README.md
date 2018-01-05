@@ -24,5 +24,5 @@ Improvements to be made:
   -Addition of Planekator procedure/app  
   -Make useful for mobile interfaces  
   -Improved workflow control
-
+  -Allow for date to be set by user in case of no internet at time of verification
   
