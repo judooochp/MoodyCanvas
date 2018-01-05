@@ -20,7 +20,7 @@ Improvements to be made:
   -Aesthetic design improvements  
   -Template standardization  
   -Lightbox warnings  
-  -Making live on an actual server  
+  xMaking live on an actual server  
   -Addition of Planekator procedure/app  
   -Make useful for mobile interfaces  
 
