@@ -1,0 +1,329 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Moody Canvas!</title>
+    {% load static %}
+    <script src="{% static "Moody/heights.js" %}"></script>
+    <style media="print">
+        .zoom2 {
+            transform: scale(0.5, 0.5);
+            position: absolute;
+            left: -250px;
+            top: -357px;
+        }
+    </style>
+    <style media="screen">
+        @media screen {
+            body {
+                color: #333;
+                vertical-align: middle;
+                text-align: center;
+                font-family: sans-serif;
+                font-size: 14px;
+            }
+
+            a, a:visited, a:active {
+                color: #500;
+                text-decoration: none;
+            }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+            .zoom2 {
+                transform: scale(0.5,0.5);
+                position: absolute;
+                left: -250px;
+                top: -350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="sPlateNum" width="1050" height="1425" class="zoom2">Surface Plate drawing must be viewed in a modern browser with Canvas compatibility.<br />Please open C:\Users\Jacob\Desktop in Internet Explorer 9 or better, Firefox, Chrome, Safari, or Opera.</canvas>
+    <script>
+        var canvasNum = document.getElementById("sPlateNum");
+        var contextNum = canvasNum.getContext("2d");
+        {% for profile in profile_list %}
+        var Line{{ forloop.counter }} = [{% for meas in profile.meas_set.all %}{{ meas.measurement }}, {% endfor %}];
+        {% endfor %}
+        var zRot = 15;
+        var xRot = 45;
+        var minElev = {{ profile_list.0.verif_id.verif_min }};
+        var maxElev = {{ profile_list.0.verif_id.verif_max }};
+        var flatness = {{ profile_list.0.verif_id.verif_flat }};
+        var xSize = 1050;
+        var ySize = 1425;
+        var pWid = Line4.length - 1;
+        var pLen = Line3.length - 1;
+        var pDiag = Line1.length - 1;
+        var angle = Math.atan(pLen / pWid);
+        var zDiv = 1350 / (maxElev - minElev) / 8;
+        var diagLen = Math.sqrt(pWid * pWid + pLen * pLen);
+        var mult = xSize / diagLen;
+        var zRotCos, zRotSin, xRotCos;
+        var zRotDiagX = Math.cos(2 * Math.PI - angle);
+        var zRotDiagY = Math.sin(2 * Math.PI - angle);
+        var RefLine = "{{ profile_list.0.verif_id.verif_north }}";
+        var x;
+        var y;
+        var xPrime;
+        var yPrime;
+        var i;
+
+        function getBaseline() {
+            if (pWid > 12 && maxElev > 999) {
+                if ((i % 2) > 0) {
+                    contextNum.textBaseline = "bottom";
+                } else {
+                    contextNum.textBaseline = "top";
+                }
+            } else {
+                contextNum.textBaseline = "alphabetic";
+            }
+        }
+        function drawMap() {
+            "use strict";
+            contextNum.font = "12pt Arial";
+            contextNum.textAlign = "left";
+            contextNum.fillText("Customer: {{ profile_list.0.verif_id.plate_id.cust_id.cust_name }}", 0.06 * xSize, 0.06 * ySize * 0.25);
+            contextNum.fillText("Plate ID: {{ profile_list.0.verif_id.plate_id.plate_id }}", 0.06 * xSize, 0.06 * ySize * 0.5);
+            contextNum.fillText("Plate SN: {{ profile_list.0.verif_id.plate_id.plate_sn }}", 0.06 * xSize, 0.06 * ySize * 0.75);
+            contextNum.fillText("Plate Mfr: {{ profile_list.0.verif_id.plate_id.plate_mfr }}", 0.06 * xSize, 0.06 * ySize * 1);
+            contextNum.fillText("Width: {{ profile_list.0.verif_id.plate_id.plate_wid }}", 0.06 * xSize, 0.06 * ySize * 1.25);
+            contextNum.fillText("Length: {{ profile_list.0.verif_id.plate_id.plate_len }}", 0.06 * xSize, 0.06 * ySize * 1.5);
+            contextNum.fillText("Center is Zero (0 \u00B5in) Elevation.", 0.06 * xSize, 0.06 * ySize * 1.75);
+            contextNum.fillText("Reference Line (bold): {{ profile_list.0.verif_id.verif_north }}", 0.35 * xSize, 0.06 * ySize * 0.25);
+            contextNum.fillText("Foot Size: {{ profile_list.0.verif_id.verif_foot }} in", 0.35 * xSize, 0.06 * ySize * 0.5);
+            contextNum.fillText("Border (X): {{ profile_list.0.verif_id.verif_EW }} in", 0.35 * xSize, 0.06 * ySize * 0.75);
+            contextNum.fillText("Border (Y): {{ profile_list.0.verif_id.verif_NS }} in", 0.35 * xSize, 0.06 * ySize * 1);
+            contextNum.fillText("Run Description: {{ profile_list.0.verif_id.verif_descr }}", 0.65 * xSize, 0.06 * ySize * 0.25);
+            contextNum.fillText("Grade: {{ profile_list.0.verif_id.verif_grade }}", 0.65 * xSize, 0.06 * ySize * 0.5);
+            contextNum.fillText("Flatness: {{ profile_list.0.verif_id.verif_flat }} \u00B5in", 0.65 * xSize, 0.06 * ySize * 0.75);
+            contextNum.fillText("Closure 7: {{ profile_list.0.verif_id.clos_7 }} \u00B5in", 0.65 * xSize, 0.06 * ySize * 1);
+            contextNum.fillText("Closure 8: {{ profile_list.0.verif_id.clos_8 }} \u00B5in", 0.65 * xSize, 0.06 * ySize * 1.25);
+            contextNum.fillText("Repeat: {{ profile_list.0.verif_id.verif_rep }} \u00B5in", 0.65 * xSize, 0.06 * ySize * 1.5);
+            contextNum.fillText("Certificate: {{ profile_list.0.verif_id.verif_cert }}", xSize * 0.06, ySize - (ySize * 0.06 * 0.25));
+            contextNum.fillText("Technician: {{ profile_list.0.verif_id.verif_tech }}", xSize * 0.35, ySize - (ySize * 0.06 * 0.25));
+            contextNum.fillText("Date: {{ profile_list.0.verif_id.verif_date.date }}", xSize * 0.65, ySize - (ySize * 0.06 * 0.25));
+            contextNum.fillText("Page 1 of 1", xSize * 0.9, ySize - (ySize * 0.06 * 0.25));
+            for (i = 0; i < pDiag + 1; i += 1) {
+                x = zRotDiagX * (diagLen * (pDiag - i) / pDiag);
+                y = zRotDiagY * (diagLen * (pDiag - i) / pDiag);
+                contextNum.font = "14pt Arial";
+                if (Line1[i] == maxElev || Line1[i] == minElev) {
+                    contextNum.font = "bold 21pt Arial";
+                }
+                if (i > pDiag * 0.3 && i < pDiag * 0.5) {
+                    contextNum.textAlign = "left";
+                } else if (i < pDiag * 0.7 && i > pDiag * 0.5) {
+                    contextNum.textAlign = "right";
+                } else {
+                    contextNum.textAlign = "center";
+                }
+                if (i == 0) {
+                    contextNum.fillText(Line1[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2) + 10, (y + (pLen / 2)) * mult + (ySize / 2)) - 10;
+                } else if (i == pDiag) {
+                    contextNum.fillText(Line1[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2) - 10, (y + (pLen / 2)) * mult + (ySize / 2)) + 10;
+                } else {
+                    contextNum.fillText(Line1[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2), (y + (pLen / 2)) * mult + (ySize / 2));
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+            }
+            for (i = 0; i < pDiag + 1; i += 1) {
+                x = zRotDiagX * (diagLen * (pDiag - i) / pDiag);
+                y = -pLen - (zRotDiagY * (diagLen * (pDiag - i) / pDiag));
+                contextNum.font = "14pt Arial";
+                if (Line2[i] == maxElev || Line2[i] == minElev) {
+                    contextNum.font = "bold 21pt Arial";
+                }
+                if (i > pDiag * 0.3 && i < pDiag * 0.5) {
+                    contextNum.textAlign = "left";
+                } else if (i < pDiag * 0.7 && i > pDiag * 0.5) {
+                    contextNum.textAlign = "right";
+                } else {
+                    contextNum.textAlign = "center";
+                }
+                if (i == 0) {
+                    contextNum.fillText(Line2[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2) + 10, (y + (pLen / 2)) * mult + (ySize / 2)) + 10;
+                } else if (i == pDiag) {
+                    contextNum.fillText(Line2[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2) - 10, (y + (pLen / 2)) * mult + (ySize / 2)) - 10;
+                } else {
+                    contextNum.fillText(Line2[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2), (y + (pLen / 2)) * mult + (ySize / 2));
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+            }
+            for (i = 0; i < pLen + 1; i += 1) {
+                x = pWid;
+                y = -i;
+                if (RefLine == "3") {
+                    contextNum.font = "bold 14pt Arial";
+                } else {
+                    contextNum.font = "14pt Arial";
+                }
+                if (Line3[i] == maxElev || Line3[i] == minElev) {
+                    contextNum.font = "bold 21pt Arial";
+                }
+                if (i == 0 || i == pLen || i == pLen / 2) {
+                    // Do not print -- Avoid confusion.
+                } else {
+                    contextNum.textAlign = "left";
+                    contextNum.fillText(Line3[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2) + 10, (y + (pLen / 2)) * mult + (ySize / 2));
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+            }
+            for (i = 0; i < pWid + 1; i += 1) {
+                x = pWid - i;
+                y = -pLen;
+                contextNum.textAlign = "center";
+                if (RefLine == "4") {
+                    contextNum.font = "bold 14pt Arial";
+                } else {
+                    contextNum.font = "14pt Arial";
+                }
+                if (Line4[i] == maxElev || Line4[i] == minElev) {
+                    contextNum.font = "bold 21pt Arial";
+                }
+                if (i == 0 || i == pWid || i == pWid / 2) {
+                    // Do not print -- Avoid confusion.
+                } else {
+                    contextNum.textBaseline = getBaseline();
+                    contextNum.fillText(Line4[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2), (y + (pLen / 2)) * mult + (ySize / 2) - 10);
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+            }
+            for (i = 0; i < pLen + 1; i += 1) {
+                x = 0;
+                y = i - pLen;
+                if (RefLine == "5") {
+                    contextNum.font = "bold 14pt Arial";
+                } else {
+                    contextNum.font = "14pt Arial";
+                }
+                if (Line5[i] == maxElev || Line5[i] == minElev) {
+                    contextNum.font = "bold 21pt Arial";
+                }
+                if (i == 0 || i == pLen || i == pLen / 2) {
+                    // Do not print -- Avoid confusion.
+                } else {
+                    contextNum.textAlign = "right";
+                    contextNum.fillText(Line5[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2) - 10, (y + (pLen / 2)) * mult + (ySize / 2));
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+            }
+            for (i = 0; i < pWid + 1; i += 1) {
+                x = i;
+                y = 0;
+                contextNum.textAlign = "center";
+                if (RefLine == "6") {
+                    contextNum.font = "bold 14pt Arial";
+                } else {
+                    contextNum.font = "14pt Arial";
+                }
+                if (Line6[i] == maxElev || Line6[i] == minElev) {
+                    contextNum.font = "bold 21pt Arial";
+                }
+                if (i == 0 || i == pWid || i == pWid / 2) {
+                    // Do not print -- Avoid confusion.
+                } else {
+                    contextNum.textBaseline = getBaseline();
+                    contextNum.fillText(Line6[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2), (y + (pLen / 2)) * mult + (ySize / 2) + 10);
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+            }
+            for (i = 0; i < pWid + 1; i += 1) {
+                x = pWid - i;
+                y = -pLen / 2;
+                contextNum.font = "14pt Arial";
+                if (Line7[i] == maxElev || Line7[i] == minElev) {
+                    contextNum.font = "bold 21pt Arial";
+                }
+                if (i == 0 || i == pWid) {
+                    contextNum.textBaseline = "alphabetic";
+                } else {
+                    contextNum.textBaseline = getBaseline();
+                }
+                if (x == pWid / 2) {
+                    // Don't print it. It gets ugly.
+                } else {
+                    contextNum.fillText(Line7[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2), (y + (pLen / 2)) * mult + (ySize / 2));
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+            }
+            for (i = 0; i < pLen + 1; i += 1) {
+                x = pWid / 2;
+                y = i - pLen;
+                contextNum.font = "14pt Arial";
+                contextNum.textAlign = "center";
+                if (Line8[i] == maxElev || Line8[i] == minElev) {
+                    contextNum.font = "bold 21pt Arial";
+                }
+                if (y == -pLen / 2) {
+                    // Don't Print it; It gets confusing.
+                } else {
+                    contextNum.fillText(Line8[i], (x - (pWid / 2)) * (mult / 36 * 51.225 * 0.85) + (xSize / 2), (y + (pLen / 2)) * mult + (ySize / 2));
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+            }
+        }
+        function zRotate() {
+            var checkAngle = document.getElementById("angleIn").value;
+            if (isNaN(checkAngle)) {
+                window.alert("Must enter a number.");
+            } else {
+                if (checkAngle == "") {
+                    zRot -= 5;
+                } else {
+                    zRot = checkAngle;
+                }
+                contextNum.clearRect(0, 0, xSize, ySize);
+                drawMap();
+                document.getElementById("angleIn").value = "";
+            }
+        }
+        drawMap();
+        document.getElementById("angleGo").addEventListener("click", zRotate);
+    </script>
+</body>
+</html>

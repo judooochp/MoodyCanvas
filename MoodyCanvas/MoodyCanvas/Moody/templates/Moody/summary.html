@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Moody Canvas!</title>
+
+    <style>
+        <!--
+        body {
+            color: #333;
+            background-color: #ddd;
+            vertical-align: middle;
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+
+        a, a:visited, a:active {
+            color: #500;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, li {
+            list-style-type: none;
+            list-style-position: inside;
+            padding: 0;
+            margin: 0;
+        }
+
+        #footer {
+            right: 0;
+            left: 0;
+            text-align: center;
+            font-family: Courier New, Courier, monospace;
+            font-size: 12px;
+            padding-bottom: 5px;
+            margin-top: 20px;
+        }
+
+        #profiles {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .profile {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 10px;
+        }
+
+        .measurements {
+            list-style: none;
+            margin: 5px 0;
+            padding: 0;
+        }
+
+        #nav {
+            list-style-type: none;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        #nav li {
+            list-style-type: none;
+            display: inline-block;
+        }
+
+        #header {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto;
+            text-align: center;
+            width: 60%;
+            border-bottom: 1px solid #444;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <ul id="nav">
+            <li><a href="{% url 'home:index' %}" style="font-size: 18px; font-family: Courier New, Courier, monospace; margin-right: 50px;">Moody Canvas!</a></li>
+            <li><a rel="dead placeholder link">Procedure</a> &raquo;</li>
+            <li><a href="{% url 'Moody:index' %}">Home</a> &raquo;</li>
+            <li><a href="{% url 'Moody:customers' %}">Customers</a> &raquo;</li>
+            <li><a href="{% url 'Moody:plates' view.kwargs.custname %}">Plates</a> &raquo;</li>
+            <li><a href="{% url 'Moody:verifs' view.kwargs.custname view.kwargs.id_no %}">Verifications</a></li>
+        </ul>
+    </div>
+    {% if profile_list %}
+    <h2>{{ view.kwargs.custname }}: {{ view.kwargs.id_no }} on {{ profile_list.0.verif_id.verif_date.date }} at {{ profile_list.0.verif_id.verif_date.time }}</h2>
+    <p>
+        <a href="{% url 'Moody:new_verif' view.kwargs.custname view.kwargs.id_no %}">Verify Again</a><br /><br />
+        <a href="{% url 'Moody:canvas' view.kwargs.custname view.kwargs.id_no view.kwargs.ver_id %}">Show Moody Map</a><br />
+        <a href="{% url 'Moody:heights' view.kwargs.custname view.kwargs.id_no view.kwargs.ver_id %}">Show Heights Map</a><br />
+    </p>
+    <h2>Plate Info:</h2>
+    <p>
+        <div style="display: inline-block; margin-right: 50px;">
+            <div style="display: inline-block; margin-right: 10px; text-align: right;">
+                <span>Manufacturer: </span><br />
+                <span>Serial No.: </span>
+            </div>
+            <div style="display: inline-block; text-align: left;">
+                <span>{{ profile_list.0.verif_id.plate_id.plate_mfr }}</span><br />
+                <span>{{ profile_list.0.verif_id.plate_id.plate_sn }}</span>
+            </div>
+        </div>
+        <div style="display: inline-block;">
+            <div style="display: inline-block; margin-right: 10px; text-align: right;">
+                <span>Width: </span><br />
+                <span>Length:</span>
+            </div>
+            <div style="display: inline-block; text-align: left;">
+                <span>{{ profile_list.0.verif_id.plate_id.plate_wid }} in</span><br />
+                <span>{{ profile_list.0.verif_id.plate_id.plate_len }} in</span>
+            </div>
+        </div>
+    </p>
+    <h2>Verification Info:</h2>
+
+    <p>
+        <div style="display: inline-block;">
+            <div style="display: inline-block; margin-right: 10px; text-align: right;">
+                <span>Certification No.:</span><br />
+                <span>Technician:</span><br />
+                <span>Reference Line:</span><br />
+                <span>Foot Spacing:</span><br />
+                <span>Min:</span><br />
+                <span>Line 7 Closure Error:</span><br />
+                <span>Start Temp:</span><br />
+                <span>End Temp:</span>
+            </div>
+            <div style="display: inline-block; text-align: left;">
+                <span>{{ profile_list.0.verif_id.verif_cert }}</span><br />
+                <span>{{ profile_list.0.verif_id.verif_tech }}</span><br />
+                <span>Line {{ profile_list.0.verif_id.verif_north }}</span><br />
+                <span>{{ profile_list.0.verif_id.verif_foot }} in</span><br />
+                <span>{{ profile_list.0.verif_id.verif_min }} &micro;in</span><br />
+                <span>{{ profile_list.0.verif_id.clos_7 }} &micro;in</span><br />
+                <span>{{ profile_list.0.verif_id.verif_start }} &deg;F</span><br />
+                <span>{{ profile_list.0.verif_id.verif_end }} &deg;F</span><br />
+            </div>
+        </div>
+        <div style="display: inline-block;">
+            <div style="display: inline-block; margin-right: 10px; text-align: right;">
+                <span>Run Description:</span><br />
+                <span>Top Temp:</span><br />
+                <span>Bottom Temp:</span><br />
+                <span>Repeat Reading:</span><br />
+                <span>Max:</span><br />
+                <span>Line 8 Closure Error:</span><br />
+                <span>Flatness:</span><br />
+                <span>Plate Grade:</span><br />
+            </div>
+            <div style="display: inline-block; text-align: left;">
+                <span>{{ profile_list.0.verif_id.verif_descr }}</span><br />
+                <span>{{ profile_list.0.verif_id.verif_bot }} &deg;F</span><br />
+                <span>{{ profile_list.0.verif_id.verif_top }} &deg;F</span><br />
+                <span>{{ profile_list.0.verif_id.verif_rep }} &micro;in</span><br />
+                <span>{{ profile_list.0.verif_id.verif_max }} &micro;in</span><br />
+                <span>{{ profile_list.0.verif_id.clos_8 }} &micro;in</span><br />
+                <span>{{ profile_list.0.verif_id.verif_flat }} &micro;in</span><br />
+                <span>{{ profile_list.0.verif_id.verif_grade }}</span><br />
+            </div>
+        </div>
+    </p>
+    <h3>Measurements (&micro;in):</h3>
+    <ul id="profiles">
+        {% for profile in profile_list %}
+        <li class="profile">
+            </Dev>Line {{ forloop.counter }}:
+            <ul class="measurements">
+                {% for meas in profile.meas_set.all %}
+                <li>{{ meas.measurement }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <h2>There is no verification with this ID# for {{ view.kwargs.custname}}'s plate id# {{ view.kwargs.id_no }}</h2>
+    {% endif %}
+</body>
+</html>

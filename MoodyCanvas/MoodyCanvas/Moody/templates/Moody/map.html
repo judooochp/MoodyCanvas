@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Moody Canvas!</title>
+    {% load static %}
+    <script src="{% static "Moody/map.js" %}"></script>
+    <style media="print">
+        @media print {
+            .no-display {
+                display: none;
+            }
+
+            .zoom1 {
+                transform: scale(0.5, 0.5);
+                position: absolute;
+                left: -250px;
+                top: -357px;
+            }
+        }
+    </style>
+    <style media="screen">
+        @media screen {
+            body {
+                color: #333;
+                vertical-align: middle;
+                text-align: center;
+                font-family: sans-serif;
+                font-size: 14px;
+            }
+
+            a, a:visited, a:active {
+                color: #500;
+                text-decoration: none;
+            }
+
+                a:hover {
+                    text-decoration: underline;
+                }
+
+            ul, li {
+                list-style-type: none;
+                list-style-position: inside;
+                padding: 0;
+                margin: 0;
+            }
+
+            #footer {
+                right: 0;
+                left: 0;
+                text-align: center;
+                font-family: Courier New, Courier, monospace;
+                font-size: 12px;
+                padding-bottom: 5px;
+                margin-top: 20px;
+            }
+
+            .zoom1 {
+                transform: scale(0.5,0.5);
+                position: absolute;
+                left: -250px;
+                top: -250px;
+            }
+
+            #sPlate {
+                background-color: white;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-display">
+        <form name="zRotForm" class="no-display">
+            <input id="angleIn" style="width:50px" type="text" class="no-display" />
+            <input type="button" id="angleGo" value="Enter Angle in Degrees (&deg;)" class="no-display" /><br />Press with no value to add 5&deg; (degrees) to viewing angle.<br />
+            Or enter value, tab out, and click to set your custom angle.
+        </form>
+    </div>
+    <p class="no-display">
+        When printing, you may need to select the "Shrink to Fit" or "Fit to Page" option.
+    </p>
+    <canvas id="sPlate" width="1050" height="1425" style="page-break-after:always;" class="zoom1">
+        <p>Surface Plate drawing must be viewed in a modern browser with Canvas compatibility.<br />Please open file in Internet Explorer 9 or better, Firefox, Chrome, Safari, or Opera.</p>
+    </canvas>
+
+    
+    <script>
+        var canvas = document.getElementById("sPlate");
+        var context = canvas.getContext("2d");
+        {% for profile in profile_list %}
+        var Line{{ forloop.counter }} = [{% for meas in profile.meas_set.all %}{{ meas.measurement }}, {% endfor %}];
+        {% endfor %}
+        var zRot = 15;
+        var xRot = 45;
+        var minElev = {{ profile_list.0.verif_id.verif_min }};
+        var maxElev = {{ profile_list.0.verif_id.verif_max }};
+        var flatness = {{ profile_list.0.verif_id.verif_flat }};
+        var xSize = 1050;
+        var ySize = 1425;
+        var pWid = Line4.length - 1;
+        var pLen = Line3.length - 1;
+        var pDiag = Line1.length - 1;
+        var angle = Math.atan(pLen / pWid);
+        var zDiv = 1350 / (maxElev - minElev) / 8;
+        var diagLen = Math.sqrt(pWid * pWid + pLen * pLen);
+        var mult = xSize / diagLen;
+        var zRotCos, zRotSin, xRotCos;
+        var zRotDiagX = Math.cos(2 * Math.PI - angle);
+        var zRotDiagY = Math.sin(2 * Math.PI - angle);
+        var RefLine = "{{ profile_list.0.verif_id.verif_north }}";
+        var x;
+        var y;
+        var xPrime;
+        var yPrime;
+        var i;
+        function drawMap() {
+            "use strict";
+            context.font = "12pt Arial";
+            context.textAlign = "left";
+
+            //  Header Info
+            context.fillText("Customer: {{ profile_list.0.verif_id.plate_id.cust_id.cust_name }}", 0.06 * xSize, 0.06 * ySize * 0.25);
+            context.fillText("Plate ID: {{ profile_list.0.verif_id.plate_id.plate_id }}", 0.06 * xSize, 0.06 * ySize * 0.5);
+            context.fillText("Plate SN: {{ profile_list.0.verif_id.plate_id.plate_sn }}", 0.06 * xSize, 0.06 * ySize * 0.75);
+            context.fillText("Plate Mfr: {{ profile_list.0.verif_id.plate_id.plate_mfr }}", 0.06 * xSize, 0.06 * ySize * 1);
+            context.fillText("Width: {{ profile_list.0.verif_id.plate_id.plate_wid }}", 0.06 * xSize, 0.06 * ySize * 1.25);
+            context.fillText("Length: {{ profile_list.0.verif_id.plate_id.plate_len }}", 0.06 * xSize, 0.06 * ySize * 1.5);
+            context.fillText("Center is Zero (0 \u00B5in) Elevation.", 0.06 * xSize, 0.06 * ySize * 1.75);
+            context.fillText("Reference Line (bold): {{ profile_list.0.verif_id.verif_north }}", 0.35 * xSize, 0.06 * ySize * 0.25);
+            context.fillText("Foot Size: {{ profile_list.0.verif_id.verif_foot }} in", 0.35 * xSize, 0.06 * ySize * 0.5);
+            context.fillText("Border (X): {{ profile_list.0.verif_id.verif_EW }} in", 0.35 * xSize, 0.06 * ySize * 0.75);
+            context.fillText("Border (Y): {{ profile_list.0.verif_id.verif_NS }} in", 0.35 * xSize, 0.06 * ySize * 1);
+            context.fillText("Run Description: {{ profile_list.0.verif_id.verif_descr }}", 0.65 * xSize, 0.06 * ySize * 0.25);
+            context.fillText("Grade: {{ profile_list.0.verif_id.verif_grade }}", 0.65 * xSize, 0.06 * ySize * 0.5);
+            context.fillText("Flatness: {{ profile_list.0.verif_id.verif_flat }} \u00B5in", 0.65 * xSize, 0.06 * ySize * 0.75);
+            context.fillText("Closure 7: {{ profile_list.0.verif_id.clos_7 }} \u00B5in", 0.65 * xSize, 0.06 * ySize * 1);
+            context.fillText("Closure 8: {{ profile_list.0.verif_id.clos_8 }} \u00B5in", 0.65 * xSize, 0.06 * ySize * 1.25);
+            context.fillText("Repeat: {{ profile_list.0.verif_id.verif_rep }} \u00B5in", 0.65 * xSize, 0.06 * ySize * 1.5);
+            context.fillText("Certificate: {{ profile_list.0.verif_id.verif_cert }}", xSize * 0.06, ySize - (ySize * 0.06 * 0.25));
+            context.fillText("Technician: {{ profile_list.0.verif_id.verif_tech }}", xSize * 0.35, ySize - (ySize * 0.06 * 0.25));
+            context.fillText("Date: {{ profile_list.0.verif_id.verif_date.date }}", xSize * 0.65, ySize - (ySize * 0.06 * 0.25));
+            context.fillText("Page 1 of 1", xSize * 0.9, ySize - (ySize * 0.06 * 0.25));
+
+            //  Drawing math
+            zRotCos = Math.cos(zRot * Math.PI / 180);
+            zRotSin = Math.sin(zRot * Math.PI / 180);
+            xRotCos = Math.cos(xRot * Math.PI / 180);
+            var AArray = [];
+            var aotLine = [];
+            for (i = 0; i < pDiag + 1; i += 1) {
+                x = zRotDiagX * (diagLen * (pDiag - i) / pDiag);
+                y = zRotDiagY * (diagLen * (pDiag - i) / pDiag);
+                context.lineWidth = 1;
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+                AArray.push((x * mult) + (xSize / 2));
+                AArray.push((y * mult) + (ySize / 2) - ((Line1[i] - minElev) * zDiv));
+                aotLine.push((x * mult) + (xSize / 2));
+                aotLine.push((y * mult) + (ySize / 2));
+                context.beginPath();
+                context.moveTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2));
+                context.lineTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2) - ((Line1[i] - minElev) * zDiv));
+                context.stroke();
+            }
+            for (i = 0; i < AArray.length * 2 - 1; i += 2) {
+                context.beginPath();
+                context.moveTo(AArray[i], AArray[i + 1]);
+                context.lineTo(AArray[i + 2], AArray[i + 3]);
+                context.stroke();
+                context.beginPath();
+                context.moveTo(aotLine[i], aotLine[i + 1]);
+                context.lineTo(aotLine[i + 2], aotLine[i + 3]);
+                context.stroke();
+            }
+            var BArray = [];
+            var botLine = [];
+            for (i = 0; i < pDiag + 1; i += 1) {
+                x = zRotDiagX * (diagLen * (pDiag - i) / pDiag);
+                y = -pLen - (zRotDiagY * (diagLen * (pDiag - i) / pDiag));
+                context.lineWidth = 1;
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+                BArray.push((x * mult) + (xSize / 2));
+                BArray.push((y * mult) + (ySize / 2) - ((Line2[i] - minElev) * zDiv));
+                botLine.push((x * mult) + (xSize / 2));
+                botLine.push((y * mult) + (ySize / 2));
+                context.beginPath();
+                context.moveTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2));
+                context.lineTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2) - ((Line2[i] - minElev) * zDiv));
+                context.stroke();
+            }
+            for (i = 0; i < BArray.length * 2 - 1; i += 2) {
+                context.beginPath();
+                context.moveTo(BArray[i], BArray[i + 1]);
+                context.lineTo(BArray[i + 2], BArray[i + 3]);
+                context.stroke();
+                context.beginPath();
+                context.moveTo(botLine[i], botLine[i + 1]);
+                context.lineTo(botLine[i + 2], botLine[i + 3]);
+                context.stroke();
+            }
+            var CArray = [];
+            var cotLine = [];
+            for (i = 0; i < pLen + 1; i += 1) {
+                x = pWid;
+                y = -i;
+                if (RefLine == "3") {
+                    context.lineWidth = 3;
+                } else {
+                    context.lineWidth = 1;
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+                CArray.push((x * mult) + (xSize / 2));
+                CArray.push((y * mult) + (ySize / 2) - ((Line3[i] - minElev) * zDiv));
+                cotLine.push((x * mult) + (xSize / 2));
+                cotLine.push((y * mult) + (ySize / 2));
+                context.beginPath();
+                context.moveTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2));
+                context.lineTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2) - ((Line3[i] - minElev) * zDiv));
+                context.stroke();
+            }
+            for (i = 0; i < CArray.length * 2 - 1; i += 2) {
+                context.beginPath();
+                context.moveTo(CArray[i], CArray[i + 1]);
+                context.lineTo(CArray[i + 2], CArray[i + 3]);
+                context.stroke();
+                context.beginPath();
+                context.moveTo(cotLine[i], cotLine[i + 1]);
+                context.lineTo(cotLine[i + 2], cotLine[i + 3]);
+                context.stroke();
+            }
+            var DArray = [];
+            var dotLine = [];
+            for (i = 0; i < pWid + 1; i += 1) {
+                x = pWid - i;
+                y = -pLen;
+                if (RefLine == "4") {
+                    context.lineWidth = 3;
+                } else {
+                    context.lineWidth = 1;
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+                DArray.push((x * mult) + (xSize / 2));
+                DArray.push((y * mult) + (ySize / 2) - ((Line4[i] - minElev) * zDiv));
+                dotLine.push((x * mult) + (xSize / 2));
+                dotLine.push((y * mult) + (ySize / 2));
+                context.beginPath();
+                context.moveTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2));
+                context.lineTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2) - ((Line4[i] - minElev) * zDiv));
+                context.stroke();
+            }
+            for (i = 0; i < DArray.length * 2 - 1; i += 2) {
+                context.beginPath();
+                context.moveTo(DArray[i], DArray[i + 1]);
+                context.lineTo(DArray[i + 2], DArray[i + 3]);
+                context.stroke();
+                context.beginPath();
+                context.moveTo(dotLine[i], dotLine[i + 1]);
+                context.lineTo(dotLine[i + 2], dotLine[i + 3]);
+                context.stroke();
+            }
+            var EArray = [];
+            var eotLine = [];
+            for (i = 0; i < pLen + 1; i += 1) {
+                x = 0;
+                y = i - pLen;
+                if (RefLine == "5") {
+                    context.lineWidth = 3;
+                } else {
+                    context.lineWidth = 1;
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+                EArray.push((x * mult) + (xSize / 2));
+                EArray.push((y * mult) + (ySize / 2) - ((Line5[i] - minElev) * zDiv));
+                eotLine.push((x * mult) + (xSize / 2));
+                eotLine.push((y * mult) + (ySize / 2));
+                context.beginPath();
+                context.moveTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2));
+                context.lineTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2) - ((Line5[i] - minElev) * zDiv));
+                context.stroke();
+            }
+            for (i = 0; i < EArray.length * 2 - 1; i += 2) {
+                context.beginPath();
+                context.moveTo(EArray[i], EArray[i + 1]);
+                context.lineTo(EArray[i + 2], EArray[i + 3]);
+                context.stroke();
+                context.beginPath();
+                context.moveTo(eotLine[i], eotLine[i + 1]);
+                context.lineTo(eotLine[i + 2], eotLine[i + 3]);
+                context.stroke();
+            }
+            var FArray = [];
+            var fotLine = [];
+            for (i = 0; i < pWid + 1; i += 1) {
+                x = i;
+                y = 0;
+                if (RefLine == "6") {
+                    context.lineWidth = 3;
+                } else {
+                    context.lineWidth = 1;
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+                FArray.push((x * mult) + (xSize / 2));
+                FArray.push((y * mult) + (ySize / 2) - ((Line6[i] - minElev) * zDiv));
+                fotLine.push((x * mult) + (xSize / 2));
+                fotLine.push((y * mult) + (ySize / 2));
+                context.beginPath();
+                context.moveTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2));
+                context.lineTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2) - ((Line6[i] - minElev) * zDiv));
+                context.stroke();
+            }
+            for (i = 0; i < FArray.length * 2 - 1; i += 2) {
+                context.beginPath();
+                context.moveTo(FArray[i], FArray[i + 1]);
+                context.lineTo(FArray[i + 2], FArray[i + 3]);
+                context.stroke();
+                context.beginPath();
+                context.moveTo(fotLine[i], fotLine[i + 1]);
+                context.lineTo(fotLine[i + 2], fotLine[i + 3]);
+                context.stroke();
+            }
+            var GArray = [];
+            var gotLine = [];
+            for (i = 0; i < pWid + 1; i += 1) {
+                x = pWid - i;
+                y = -pLen / 2;
+                context.lineWidth = 1;
+                if (Line7[i] == maxElev || Line7[i] == minElev) {
+                }
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+                GArray.push((x * mult) + (xSize / 2));
+                GArray.push((y * mult) + (ySize / 2) - ((Line7[i] - minElev) * zDiv));
+                gotLine.push((x * mult) + (xSize / 2));
+                gotLine.push((y * mult) + (ySize / 2));
+                context.beginPath();
+                context.moveTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2));
+                context.lineTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2) - ((Line7[i] - minElev) * zDiv));
+                context.stroke();
+            }
+            for (i = 0; i < GArray.length * 2 - 1; i += 2) {
+                context.beginPath();
+                context.moveTo(GArray[i], GArray[i + 1]);
+                context.lineTo(GArray[i + 2], GArray[i + 3]);
+                context.stroke();
+                context.beginPath();
+                context.moveTo(gotLine[i], gotLine[i + 1]);
+                context.lineTo(gotLine[i + 2], gotLine[i + 3]);
+                context.stroke();
+            }
+            var HArray = [];
+            var hotLine = [];
+            for (i = 0; i < pLen + 1; i += 1) {
+                x = pWid / 2;
+                y = i - pLen;
+                context.lineWidth = 1;
+                xPrime = (x - pWid / 2) * zRotCos - (y + pLen / 2) * zRotSin;
+                yPrime = (x - pWid / 2) * zRotSin + (y + pLen / 2) * zRotCos;
+                x = xPrime;
+                y = yPrime;
+                yPrime = y * xRotCos;
+                y = yPrime;
+                HArray.push((x * mult) + (xSize / 2));
+                HArray.push((y * mult) + (ySize / 2) - ((Line8[i] - minElev) * zDiv));
+                hotLine.push((x * mult) + (xSize / 2));
+                hotLine.push((y * mult) + (ySize / 2));
+                context.beginPath();
+                context.moveTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2));
+                context.lineTo((x * mult) + (xSize / 2), (y * mult) + (ySize / 2) - ((Line8[i] - minElev) * zDiv));
+                context.stroke();
+            }
+            for (i = 0; i < HArray.length * 2 - 1; i += 2) {
+                context.beginPath();
+                context.moveTo(HArray[i], HArray[i + 1]);
+                context.lineTo(HArray[i + 2], HArray[i + 3]);
+                context.stroke();
+                context.beginPath();
+                context.moveTo(hotLine[i], hotLine[i + 1]);
+                context.lineTo(hotLine[i + 2], hotLine[i + 3]);
+                context.stroke();
+            }
+        }
+        function zRotate() {
+            var checkAngle = document.getElementById("angleIn").value;
+            if (isNaN(checkAngle)) {
+                window.alert("Must enter a number.");
+            } else {
+                if (checkAngle == "") {
+                    zRot -= 5;
+                } else {
+                    zRot = checkAngle;
+                }
+                context.clearRect(0, 0, xSize, ySize);
+                drawMap();
+                document.getElementById("angleIn").value = "";
+            }
+        }
+        drawMap();
+        document.getElementById("angleGo").addEventListener("click", zRotate);
+    </script>
+</body>
+</html>
