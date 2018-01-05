@@ -199,7 +199,7 @@
                     <input id="ref_line" name="ref_line" type="number" step="1" value="" readonly /><br />
                     <input id="temp_end" name="temp_end" type="number" step="0.01" readonly /><br />
                     <input id="repeat" name="repeat" type="number" step="1" readonly /><br />
-                    <input id="foot_len" name="foot_len" type="number" step="1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" onchange="wid_meas(), len_meas(), diag_meas()" readonly /><br />
+                    <input id="foot_len" name="foot_len" type="number" step="1" value="4" onfocus="display_warning();" onblur="undisplay_warning();" onchange="repopulate();" readonly /><br />
                 </div>
                 <input id="meas_along_len" name="meas_along_len" type="hidden" value="" />
                 <input id="meas_along_wid" name="meas_along_wid" type="hidden" value="" />
@@ -235,6 +235,12 @@
                 wid_meas(),
                 len_meas(),
                 diag_meas(),
+                for (var i = 1; i < 9; i++) {
+                    var node_in_question = document.getElementById("profile_" + i.toString());
+                    while (node_in_question.firstChild) {
+                        node_in_question.removeChild(node_in_question.firstChild);
+                    }
+                }
                 populate_table()
             }
             function figure_margin(figure, foot_size) { //  Determine mathematically convenient margin
