@@ -12,6 +12,7 @@ Verify plates' flatness and view their results as a wireframe or as
   a map of elevations relative to the center point.  
 
 Improvements to be made:  
+  -Prevent duplicate entries to database for customers, plates
   -Login  
   -Customer control  
   -Testing and bug fixing  
