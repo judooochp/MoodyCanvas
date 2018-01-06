@@ -2,7 +2,29 @@
 <html>
 <head>
     <title>Moody Canvas!</title>
+    <script type="text/javascript">
+        <!--
+        function validateInput() {
+            var wid = document.getElementById('plate_wid');
+            var len = document.getElementById('plate_len');
+            var mfr = document.getElementById('plate_mfr');
+            var id_no = document.getElementById('plate_id');
+            var ser_no = document.getElementById('plate_sn');
+            if (wid == '' || len == '' || mfr == '' || id_no = '' || ser_no == '') {
+                alert('All fields must be filled.')
+            }
+            if (wid < 12 || len < 12) {
+                alert('This procedure is inappropriate for plates smaller than 12" x 12".')
+                return false;
+            }
+            if (!(mfr)) {
+                alert('Plate manufacturer must be non-blank. Enter "Unknown" if there are no markings.')
+                return false;
+            }
 
+        }
+        -->
+    </script>
     <style>
         <!--
         body {
@@ -79,6 +101,9 @@
     </div>
     {% if cust %}
     <h2>Add a New Plate for {{ cust }}</h2>
+    {% if id_exists %}
+    <p class="warning">You entered information that already exists for this customer.</p>
+    {% endif %}
     <form action="{% url 'Moody:save_new_plate' cust %}" method="post">
         {% csrf_token %}
         <input type="text" id="plate_id" name="plate_id" placeholder="Customer's Plate ID no." /><br />
@@ -86,7 +111,7 @@
         <input type="text" id="plate_mfr" name="plate_mfr" placeholder="Manufacturer" /><br />
         <input type="number" id="plate_wid" name="plate_wid" placeholder="Width" /><br />
         <input type="number" id="plate_len" name="plate_len" placeholder="Length" /><br />
-        <input type="submit" /><br />
+        <input type="submit" onclick="validateInput();"/><br />
         <span>Width will be saved as the less-long side.</span><br />
     </form>
 

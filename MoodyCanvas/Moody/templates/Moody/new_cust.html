@@ -2,7 +2,18 @@
 <html>
 <head>
     <title>Moody Canvas!</title>
-
+    <script>
+        <!--
+        function validateName() {
+            var input_check = document.getElementById('custname');
+            if (input_check.value == '') {
+                alert("Be sure the only possible field is not empty.");
+                return false;
+            }
+            else return true;
+        }
+        -->
+    </script>
     <style>
         <!--
         body {
@@ -77,7 +88,10 @@
         </ul>
     </div>
     <h2>Add a Customer</h2>
-    <form action="{% url 'Moody:save_new_cust' %}" method="post">
+    {% if cust_exists %}
+    <p>You entered a customer name that already exists.</p>
+    {% endif %}
+    <form action="{% url 'Moody:save_new_cust' %}" method="post" onsubmit="return validateName();">
         {% csrf_token %}
         <input placeholder="Enter Customer Name" id="custname" name="custname" type="text" /><br />
         <input type="submit" />

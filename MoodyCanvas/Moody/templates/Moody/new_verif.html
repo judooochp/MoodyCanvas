@@ -162,7 +162,7 @@
         </div>
     </p>
     <h3>Setup:</h3>
-    <form action="{% url 'Moody:save_new_verif' plate.cust_id plate.plate_id %}" method="post" onsubmit="return validateSubmit()">
+    <form action="{% url 'Moody:save_new_verif' plate.cust_id plate.plate_id %}" method="post" onsubmit="return validateSubmit();">
         {% csrf_token %}
         <p>
             <span id="warning" style="color: #800;">Only edit Margins and Footspacing if you're sure you know what you're doing.</span>
@@ -224,30 +224,30 @@
     <script>
         <!--
             window.onload = function () {
-                two_margins({{ plate.plate_wid }}, {{ plate.plate_len }}, 4),
-                wid_meas(),
-                len_meas(),
-                diag_meas(),
-                populate_table(),
-                populate_image()
+                two_margins({{ plate.plate_wid }}, {{ plate.plate_len }}, 4);
+                wid_meas();
+                len_meas();
+                diag_meas();
+                populate_table();
+                populate_image();
             }
             function repopulate() {
-                wid_meas(),
-                len_meas(),
-                diag_meas(),
+                wid_meas();
+                len_meas();
+                diag_meas();
                 for (var i = 1; i < 9; i++) {
                     var node_in_question = document.getElementById("profile_" + i.toString());
                     while (node_in_question.firstChild) {
                         node_in_question.removeChild(node_in_question.firstChild);
                     }
                 }
-                populate_table()
+                populate_table();
             }
             function figure_margin(figure, foot_size) { //  Determine mathematically convenient margin
                 if (figure % 8 == 0) {
-                    return 4
+                    return 4;
                 } else {
-                    return Math.ceil(figure * .0334)
+                    return Math.ceil(figure * .0334);
                 }
             }
             function two_margins(one, two, foot_size) {
@@ -471,6 +471,7 @@
                         return false;
                     }
                 }
+                return true;
             }
             function next() {   //  Attempt to ensure procedure's process flow is followed.
                 var cert = document.getElementById('cert_no').value

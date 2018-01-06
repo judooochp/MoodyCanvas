@@ -85,6 +85,7 @@
 
 
     <h2>{{ view.kwargs.custname }} - {{ view.kwargs.id_no }}</h2>
+    <p>{{ recent_verifs.0.plate_id.plate_mfr }}, {{ recent_verifs.0.plate_id.plate_sn }}<br />{{ recent_verifs.0.plate_id.plate_wid }} in x {{ recent_verifs.0.plate_id.plate_len }} in</p>
     <ul>
         {% for v in recent_verifs %}
         <li><a href="{% url 'Moody:summary' view.kwargs.custname view.kwargs.id_no v.id %}">{{ v }}: {{ v.verif_descr }}</a></li>
