@@ -141,6 +141,7 @@ def save_new_plate(request, custname):
     if pass_sn:
         if pass_id:
             plate.save()
+            return HttpResponseRedirect(reverse('Moody:verifs', args=(custname, plate_id,)))
         else:
             return HttpResponseRedirect(reverse('Moody:new_plate', args=(custname,)))
     else:
