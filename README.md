@@ -13,6 +13,8 @@ Verify plates' flatness and view their results as a wireframe or as
 
 Improvements to be made:  
   x Prevent duplicate entries to database for customers, plates
+  -	Build sample database
+  - Reformat Canvas Header/Footer
   - Login  
   - Customer control  
   o Testing and bug fixing  
