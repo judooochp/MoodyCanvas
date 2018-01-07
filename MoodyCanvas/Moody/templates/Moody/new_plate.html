@@ -101,24 +101,20 @@
     </div>
     {% if cust %}
     <h2>Add a New Plate for {{ cust }}</h2>
-        {% if plate_id %}
-            {% if plate_sn %}
-        <p class="warning">A plate matching ID# {{ plate_id }}, Mfr {{ plate_mfr }}, and Serial No. {{ plate_sn }} already exists for {{ cust }}.<br />
-        <a href="{% url 'Moody:verifs' cust plate_id %}">Go There.</a></p>
-            {% endif %}
+    {% if plate_id %}
     <p class="warning">Plate ID# {{ plate_id }} already exists for this customer.</p>
     {% endif %}
     {% if plate_sn %}
     <p class="warning">A {{ plate_mfr }} with Serial No. {{ plate_sn }} already exists for {{ cust }}.</p>
     {% endif %}
-    <form action="{% url 'Moody:save_new_plate' cust %}" method="post">
+    <form action="{% url 'Moody:save_new_plate' cust %}" method="post" onsubmit="return validateInput();">
         {% csrf_token %}
         <input type="text" id="plate_id" name="plate_id" placeholder="Customer's Plate ID no." /><br />
         <input type="text" id="plate_ser" name="plate_ser" placeholder="Serial Number" /><br />
         <input type="text" id="plate_mfr" name="plate_mfr" placeholder="Manufacturer" /><br />
         <input type="number" id="plate_wid" name="plate_wid" placeholder="Width" /><br />
         <input type="number" id="plate_len" name="plate_len" placeholder="Length" /><br />
-        <input type="submit" onclick="validateInput();"/><br />
+        <input type="submit" /><br />
         <span>Width will be saved as the less-long side.</span><br />
     </form>
 
