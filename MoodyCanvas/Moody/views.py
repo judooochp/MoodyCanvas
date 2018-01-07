@@ -138,12 +138,8 @@ def save_new_plate(request, custname):
     else:
         request.session['plate_sn'] = plate.plate_sn
         request.session['plate_mfr'] = plate.plate_mfr
-    try:
-        pass_sn
-    except: 
-        try:
-            pass_id
-        except:
+    if pass_sn:
+        if pass_id:
             plate.save()
         else:
             return HttpResponseRedirect(reverse('Moody:new_plate', args=(custname,)))
