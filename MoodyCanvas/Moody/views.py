@@ -128,23 +128,17 @@ def save_new_plate(request, custname):
     try:
         check_id = Plate.objects.get(plate_id=plate.plate_id, cust_id=plate.cust_id)
     except (Plate.DoesNotExist):
-        pass_id = True
-    else:       #   Mfr, Width & Length are constrained by JS
-        request.session['plate_id'] = plate.plate_id
-    try:
-        check_sn = Plate.objects.get(plate_sn=plate.plate_sn, plate_mfr=plate.plate_mfr)
-    except (Plate.DoesNotExist):
-        pass_sn = True
-    else:
-        request.session['plate_sn'] = plate.plate_sn
-        request.session['plate_mfr'] = plate.plate_mfr
-    if pass_sn:
-        if pass_id:
+        try:
+            check_sn = Plate.objects.get(plate_sn=plate.plate_sn, plate_mfr=plate.plate_mfr)
+        except (Plate.DoesNotExist):
             plate.save()
             return HttpResponseRedirect(reverse('Moody:verifs', args=(custname, plate_id,)))
         else:
-            return HttpResponseRedirect(reverse('Moody:new_plate', args=(custname,)))
-    else:
+            request.session['plate_sn'] = plate.plate_sn
+            request.session['plate_mfr'] = plate.plate_mfr
+            return HttpResponseRedirect(reverse('Moody:new_cust', args=(custname, plate_id,)))
+    else:       #   Mfr, Width & Length are constrained by JS
+        request.session['plate_id'] = plate.plate_id
         return HttpResponseRedirect(reverse('Moody:new_plate', args=(custname,)))
 
 class NewVerifView(generic.ListView):
