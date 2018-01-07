@@ -12,9 +12,9 @@ Verify plates' flatness and view their results as a wireframe or as
   a map of elevations relative to the center point.  
 
 Improvements to be made:  
-  x Prevent duplicate entries to database for customers, plates
-  -	Build sample database
-  - Reformat Canvas Header/Footer
+  x Prevent duplicate entries to database for customers, plates  
+  -	Build sample database  
+  - Reformat Canvas Header/Footer  
   - Login  
   - Customer control  
   o Testing and bug fixing  
@@ -26,6 +26,6 @@ Improvements to be made:
   x Making live on an VPS server : http://138.197.70.142  
   - Addition of Planekator procedure/app  
   - Make useful for mobile interfaces  
-  - Improved workflow control
-  - Allow for date to be set by user in case of no internet at time of verification
+  - Improved workflow control  
+  - Allow for date to be set by user in case of no internet at time of verification  
   
