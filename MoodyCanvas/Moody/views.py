@@ -136,7 +136,7 @@ def save_new_plate(request, custname):
         else:
             request.session['plate_sn'] = plate.plate_sn
             request.session['plate_mfr'] = plate.plate_mfr
-            return HttpResponseRedirect(reverse('Moody:new_cust', args=(custname, plate_id,)))
+            return HttpResponseRedirect(reverse('Moody:new_plate', args=(custname,)))
     else:       #   Mfr, Width & Length are constrained by JS
         request.session['plate_id'] = plate.plate_id
         return HttpResponseRedirect(reverse('Moody:new_plate', args=(custname,)))
