@@ -10,7 +10,7 @@
             var mfr = document.getElementById('plate_mfr');
             var id_no = document.getElementById('plate_id');
             var ser_no = document.getElementById('plate_sn');
-            if (wid == '' || len == '' || mfr == '' || id_no = '' || ser_no == '') {
+            if (wid == '' || len == '' || mfr == '' || id_no == '' || ser_no == '') {
                 alert('All fields must be filled.')
             }
             if (wid < 12 || len < 12) {
@@ -101,8 +101,15 @@
     </div>
     {% if cust %}
     <h2>Add a New Plate for {{ cust }}</h2>
-    {% if id_exists %}
-    <p class="warning">You entered information that already exists for this customer.</p>
+        {% if plate_id %}
+            {% if plate_sn %}
+        <p class="warning">A plate matching ID# {{ plate_id }}, Mfr {{ plate_mfr }}, and Serial No. {{ plate_sn }} already exists for {{ cust }}.<br />
+        <a href="{% url 'Moody:verifs' cust plate_id %}">Go There.</a></p>
+            {% endif %}
+    <p class="warning">Plate ID# {{ plate_id }} already exists for this customer.</p>
+    {% endif %}
+    {% if plate_sn %}
+    <p class="warning">A {{ plate_mfr }} with Serial No. {{ plate_sn }} already exists for {{ cust }}.</p>
     {% endif %}
     <form action="{% url 'Moody:save_new_plate' cust %}" method="post">
         {% csrf_token %}

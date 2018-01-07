@@ -89,7 +89,9 @@
     </div>
     <h2>Add a Customer</h2>
     {% if cust_exists %}
-    <p>You entered a customer name that already exists.</p>
+    <p>{{ cust_exists }} is already in the system.<br />
+        <a href="{% url 'Moody:plates' cust_exists %}">Go There.</a><br />
+    Or:</p>
     {% endif %}
     <form action="{% url 'Moody:save_new_cust' %}" method="post" onsubmit="return validateName();">
         {% csrf_token %}

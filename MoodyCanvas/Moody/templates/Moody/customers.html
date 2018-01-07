@@ -77,12 +77,12 @@
     </div>
 
     <h2>Customers</h2>
-    <p><a href="{% url 'Moody:new_cust' %}">Add a Customer</a></p>
+    <p><a href="{% url 'Moody:new_cust' %}">Add a New Customer</a></p>
     {% if customer_list %}
-
+    <p>View Plates For:</p>
     <ul>
         {% for c in customer_list %}
-        <li><a href="{% url 'Moody:plates' c %}">{{ c }} plates</a></li>
+        <li><a href="{% url 'Moody:plates' c %}">{{ c }}</a></li>
         {% endfor %}
     </ul>
     {% endif %}

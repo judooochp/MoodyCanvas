@@ -39,13 +39,14 @@ class VerifsView(generic.ListView):
 
 def new_cust(request):
     template = loader.get_template('Moody/new_cust.html')
-    cust = request.META.get('HTTP_HOST')
-    referer = request.META.get('HTTP_REFERER')
-    if referer == 'http://' + cust + '/Moody/new_cust/':
-        context = { 'cust_exists': True, }
-        return HttpResponse(template.render(context, request))
-    else:
+    try:
+        cust = request.session.get('new_cust')
+    except (KeyError):
         return HttpResponse(template.render(None, request))
+    else:
+        context = { 'cust_exists': cust, }
+        request.session['new_cust'] = None
+        return HttpResponse(template.render(context, request))
 
 def save_new_cust(request):
     custname = request.POST.get('custname')
@@ -57,21 +58,52 @@ def save_new_cust(request):
         cust.save()
         return HttpResponseRedirect(reverse('Moody:plates', args=(custname,)))
     else:
+        request.session['new_cust'] = custname
         return HttpResponseRedirect(reverse('Moody:new_cust'))
 
 def new_plate(request, custname):
     template = loader.get_template('Moody/new_plate.html')
-    host = request.META.get('HTTP_HOST')
-    if request.META.get('HTTP_REFERER') == 'http://' + host + '/Moody/' + custname + '/new_plate/':
-        context = { 
-            'cust': custname,
-            'id_exists': True,
-        }
+    try:
+        plate_id = request.session.get('plate_id')
+    except (KeyError):
+        try:
+            plate_sn = request.session.get('plate_sn')
+        except (KeyError):
+            context = { 
+                'cust': custname,
+            }
+            return HttpResponse(template.render(context, request))
+        else:
+            context = {
+                'cust': custname,
+                'plate_sn': plate_sn,
+                'plate_mfr': plate_mfr,
+            }
+            request.session['plate_id'] = None
+            request.session['plate_sn'] = None
+            request.session['plate_mfr'] = None
+            return HttpResponse(template.render(context, request))
     else:
-        context = { 
-            'cust': custname,
-        }
-    return HttpResponse(template.render(context, request))
+        try:
+            plate_sn = request.session.get('plate_sn')
+        except (KeyError):
+            context = { 
+                'cust': custname,
+                'plate_id': plate_id,
+            }
+            request.session['plate_id'] = None
+            return HttpResponse(template.render(context, request))
+        else:
+            context = {
+                'cust': custname,
+                'plate_id': plate_id,
+                'plate_sn': plate_sn,
+                'plate_mfr': request.session.get('plate_mfr'),
+            }
+            request.session['plate_id'] = None
+            request.session['plate_sn'] = None
+            request.session['plate_mfr'] = None
+            return HttpResponse(template.render(context, request))
     
 def save_new_plate(request, custname):
     cust = Customer.objects.get(cust_name=custname)
@@ -90,18 +122,33 @@ def save_new_plate(request, custname):
         plate_wid=width,
         plate_len=length,
     )
+    context = {
+        'cust': custname,
+    }
     try:
         check_id = Plate.objects.get(plate_id=plate.plate_id, cust_id=plate.cust_id)
     except (Plate.DoesNotExist):
+        pass_id = True
+    else:       #   Mfr, Width & Length are constrained by JS
+        request.session['plate_id'] = plate.plate_id
+    try:
+        check_sn = Plate.objects.get(plate_sn=plate.plate_sn, plate_mfr=plate.plate_mfr)
+    except (Plate.DoesNotExist):
+        pass_sn = True
+    else:
+        request.session['plate_sn'] = plate.plate_sn
+        request.session['plate_mfr'] = plate.plate_mfr
+    try:
+        pass_sn
+    except: 
         try:
-            check_sn = Plate.objects.get(plate_sn=plate.plate_sn, plate_mfr=plate.plate_mfr)
-        except (Plate.DoesNotExist):
+            pass_id
+        except:
             plate.save()
         else:
             return HttpResponseRedirect(reverse('Moody:new_plate', args=(custname,)))
-    else:       #   Mfr, Width & Length are constrained by JS
-            return HttpResponseRedirect(reverse('Moody:new_plate', args=(custname,)))
-    return HttpResponseRedirect(reverse('Moody:plates', args=(custname,)))
+    else:
+        return HttpResponseRedirect(reverse('Moody:new_plate', args=(custname,)))
 
 class NewVerifView(generic.ListView):
     template_name = 'Moody/new_verif.html'

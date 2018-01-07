@@ -83,7 +83,7 @@
     {% else %}
 
     <h2>{{ view.kwargs.custname }}'s Plates</h2>
-    <p><a href="{% url 'Moody:new_plate' view.kwargs.custname %}">Add one</a></p>
+    <p><a href="{% url 'Moody:new_plate' view.kwargs.custname %}">Add a New Plate</a></p>
     <ul>
         {% for p in plate_list %}
         <li><a href="{% url 'Moody:verifs' view.kwargs.custname p %}">{{ p }}</a></li>
