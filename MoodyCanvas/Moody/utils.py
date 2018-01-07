@@ -6,7 +6,7 @@ def sub_first(line):
     return_line = []
     sub = line[0]
     for meas in line:
-        return_line.append(meas - sub)
+        return_line.append(round((meas - sub), 2))
     return return_line
 
 #   Add each measurement to the sum of those before it.
@@ -14,7 +14,7 @@ def add_rows(line):
     return_line = []
     last = 0;
     for meas in line:
-        last += meas
+        last = round(last + meas, 2)
         return_line.append(last)
     return_line.insert(0,0)
     return return_line

@@ -59,6 +59,6 @@ class Meas(models.Model):
     measurement = models.FloatField()
 
     def __str__(self):
-        return str(self.id) + ' ' + str(self.measurement)
+        return str(self.id) + ': ' + str(self.measurement)
     
 
