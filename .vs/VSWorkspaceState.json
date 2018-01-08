@@ -2,11 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\MoodyCanvas",
-    "\\MoodyCanvas\\Moody",
+    "\\MoodyCanvas\\home\\templates\\home",
     "\\MoodyCanvas\\MoodyCanvas",
-    "\\MoodyCanvas\\Moody\\templates",
     "\\MoodyCanvas\\Moody\\templates\\Moody"
   ],
-  "SelectedNode": "\\MoodyCanvas\\Moody\\templates\\Moody\\new_verif.html",
+  "SelectedNode": "\\README.md",
   "PreviewInSolutionExplorer": false
 }
