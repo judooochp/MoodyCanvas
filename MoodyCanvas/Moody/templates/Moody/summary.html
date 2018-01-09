@@ -78,6 +78,7 @@
             width: 60%;
             border-bottom: 1px solid #444;
         }
+        -->
     </style>
 </head>
 <body>
@@ -88,13 +89,16 @@
             <li><a href="{% url 'Moody:index' %}">Home</a> &raquo;</li>
             <li><a href="{% url 'Moody:customers' %}">Customers</a> &raquo;</li>
             <li><a href="{% url 'Moody:plates' view.kwargs.custname %}">Plates</a> &raquo;</li>
-            <li><a href="{% url 'Moody:verifs' view.kwargs.custname view.kwargs.id_no %}">Verifications</a></li>
+            <li><a href="{% url 'Moody:verifs' view.kwargs.custname view.kwargs.id_no %}">Verifications</a>{% if user.is_authenticated %} &raquo;</li>
+            <li><a href="{% url 'logout' %}">Logout</a>{% endif %}</li>
         </ul>
     </div>
     {% if profile_list %}
     <h2>{{ view.kwargs.custname }}: {{ view.kwargs.id_no }} on {{ profile_list.0.verif_id.verif_date.date }} at {{ profile_list.0.verif_id.verif_date.time }}</h2>
     <p>
+{% if user.is_authenticated %}
         <a href="{% url 'Moody:new_verif' view.kwargs.custname view.kwargs.id_no %}">Verify Again</a><br /><br />
+{% endif %}       
         <a href="{% url 'Moody:canvas' view.kwargs.custname view.kwargs.id_no view.kwargs.ver_id %}">Show Moody Map</a><br />
         <a href="{% url 'Moody:heights' view.kwargs.custname view.kwargs.id_no view.kwargs.ver_id %}">Show Heights Map</a><br />
     </p>

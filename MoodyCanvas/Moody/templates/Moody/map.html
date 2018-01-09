@@ -20,6 +20,7 @@
         @media screen {
             body {
                 color: #333;
+                background-color: #ddd;
                 vertical-align: middle;
                 text-align: center;
                 font-family: sans-serif;
@@ -52,6 +53,45 @@
                 margin-top: 20px;
             }
 
+            #profiles {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            .profile {
+                display: inline-block;
+                vertical-align: top;
+                margin-right: 10px;
+            }
+
+            .measurements {
+                list-style: none;
+                margin: 5px 0;
+                padding: 0;
+            }
+
+            #nav {
+                list-style-type: none;
+                display: inline-block;
+                margin: 0 auto;
+            }
+
+                #nav li {
+                    list-style-type: none;
+                    display: inline-block;
+                }
+
+            #header {
+                position: relative;
+                display: inline-block;
+                margin: 0 auto;
+                text-align: center;
+                width: 60%;
+                border-bottom: 1px solid #444;
+            }
+
             .zoom1 {
                 transform: scale(0.5,0.5);
                 position: absolute;
@@ -64,13 +104,37 @@
             }
         }
     </style>
+    <script>
+        <!--
+        function buttonValue() {
+            theInput = document.getElementById('angleIn');
+            theButton = document.getElementById('angleGo');
+            if (theInput.value == '') {
+                theButton.value = 'Add 5 degrees';
+            } else {
+                theButton.value = 'Enter Angle';
+            }
+        }
+        -->
+    </script>
 </head>
 <body>
+    <div id="header" class="no-display">
+        <ul id="nav">
+            <li><a href="{% url 'home:index' %}" style="font-size: 18px; font-family: Courier New, Courier, monospace; margin-right: 50px;">Moody Canvas!</a></li>
+            <li><a rel="dead placeholder link">Procedure</a> &raquo;</li>
+            <li><a href="{% url 'Moody:index' %}">Home</a> &raquo;</li>
+            <li><a href="{% url 'Moody:customers' %}">Customers</a> &raquo;</li>
+            <li><a href="{% url 'Moody:plates' view.kwargs.custname %}">Plates</a> &raquo;</li>
+            <li><a href="{% url 'Moody:verifs' view.kwargs.custname view.kwargs.id_no %}">Verifications</a> &raquo;</li>
+            <li><a href="{% url 'Moody:summary' view.kwargs.custname view.kwargs.id_no view.kwargs.ver_id %}">Summary</a>{% if user.is_authenticated %} &raquo;</li>
+            <li><a href="{% url 'logout' %}">Logout</a>{% endif %}</li>
+        </ul>
+    </div>
     <div class="no-display">
         <form name="zRotForm" class="no-display">
-            <input id="angleIn" style="width:50px" type="text" class="no-display" />
-            <input type="button" id="angleGo" value="Enter Angle in Degrees (&deg;)" class="no-display" /><br />Press with no value to add 5&deg; (degrees) to viewing angle.<br />
-            Or enter value, tab out, and click to set your custom angle.
+            <input id="angleIn" style="width:50px" type="text" class="no-display" onchange="buttonValue();" />
+            <input type="button" id="angleGo" class="no-display" value="Add 5 degrees" onclick="buttonValue();" />
         </form>
     </div>
     <p class="no-display">
@@ -423,6 +487,7 @@
                 context.clearRect(0, 0, xSize, ySize);
                 drawMap();
                 document.getElementById("angleIn").value = "";
+                document.getElementById('angleGo').value = 'Add 5 degrees';
             }
         }
         drawMap();

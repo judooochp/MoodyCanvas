@@ -22,21 +22,21 @@ class CustomersView(generic.ListView):
 
     def get_queryset(self):
         return Customer.objects.order_by('cust_name')
-
+    
 class PlatesView(generic.ListView):
     template_name = 'Moody/plates.html'
     context_object_name = 'plate_list'
 
     def get_queryset(self):
         return Plate.objects.filter(cust_id=Customer.objects.get(cust_name=self.kwargs['custname']))
-
+    
 class VerifsView(generic.ListView):
     template_name = 'Moody/verifs.html'
     context_object_name = 'recent_verifs'
 
     def get_queryset(self):
         return Verif.objects.filter(plate_id=Plate.objects.get(plate_id=self.kwargs['id_no']))
-
+    
 def new_cust(request):
     template = loader.get_template('Moody/new_cust.html')
     try:
@@ -47,7 +47,7 @@ def new_cust(request):
         context = { 'cust_exists': cust, }
         request.session['new_cust'] = None
         return HttpResponse(template.render(context, request))
-
+    
 def save_new_cust(request):
     custname = request.POST.get('custname')
     custname = custname.strip()
@@ -60,7 +60,7 @@ def save_new_cust(request):
     else:
         request.session['new_cust'] = custname
         return HttpResponseRedirect(reverse('Moody:new_cust'))
-
+    
 def new_plate(request, custname):
     template = loader.get_template('Moody/new_plate.html')
     try:
@@ -140,7 +140,7 @@ def save_new_plate(request, custname):
     else:       #   Mfr, Width & Length are constrained by JS
         request.session['plate_id'] = plate.plate_id
         return HttpResponseRedirect(reverse('Moody:new_plate', args=(custname,)))
-
+    
 class NewVerifView(generic.ListView):
     template_name = 'Moody/new_verif.html'
     context_object_name = 'plate'
@@ -253,14 +253,14 @@ class SummaryView(generic.ListView):
 
     def get_queryset(self):
         return Profile.objects.filter(verif_id=Verif.objects.get(id=self.kwargs['ver_id']))
-
+    
 class CanvasView(generic.ListView):
     template_name = 'Moody/map.html'
     context_object_name = 'profile_list'
 
     def get_queryset(self):
         return Profile.objects.filter(verif_id=Verif.objects.get(id=self.kwargs['ver_id']))
-
+    
 class HeightsView(generic.ListView):
     template_name = 'Moody/heights.html'
     context_object_name = 'profile_list'

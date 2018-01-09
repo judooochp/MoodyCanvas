@@ -74,20 +74,21 @@
             <li><a rel="dead placeholder link">Procedure</a> &raquo;</li>
             <li><a href="{% url 'Moody:index' %}">Home</a> &raquo;</li>
             <li><a href="{% url 'Moody:customers' %}">Customers</a> &raquo;</li>
-            <li><a href="{% url 'Moody:plates' view.kwargs.custname %}">Plates</a></li>
+            <li><a href="{% url 'Moody:plates' view.kwargs.custname %}">Plates</a>{% if user.is_authenticated %} &raquo;</li>
+            <li><a href="{% url 'logout' %}">Logout</a>{% endif %}</li>
         </ul>
     </div>
     <h2>{{ view.kwargs.custname }} - {{ view.kwargs.id_no }}</h2>
-    {% if not recent_verifs %}
+{% if not recent_verifs %}
     <h2>No verifications on this plate.</h2>
+    {% if user.is_authenticated %}
     <p><a href="{% url 'Moody:new_verif' view.kwargs.custname view.kwargs.id_no %}">Verify This Plate Now</a></p>
-    {% else %}
-    <p>
-        Manufacturer: {{ recent_verifs.0.plate_id.plate_mfr }}; Serial No.:{{ recent_verifs.0.plate_id.plate_sn}}<br />
-        Width: {{ recent_verifs.0.plate_id.plate_wid }}; Length: {{ recent_verifs.0.plate_id.plate_len }}<br />
-    </p>
+    {% endif %}
+{% else %}
+    {% if user.is_authenticated %}
     <p><a href="{% url 'Moody:new_verif' view.kwargs.custname view.kwargs.id_no %}">Verify This Plate Now</a></p>
-    <p>{{ recent_verifs.0.plate_id.plate_mfr }}, {{ recent_verifs.0.plate_id.plate_sn }}<br />{{ recent_verifs.0.plate_id.plate_wid }} in x {{ recent_verifs.0.plate_id.plate_len }} in</p>
+    {% endif %}
+    <p>{{ recent_verifs.0.plate_id.plate_mfr }}, sn {{ recent_verifs.0.plate_id.plate_sn }}<br />{{ recent_verifs.0.plate_id.plate_wid }} in x {{ recent_verifs.0.plate_id.plate_len }} in</p>
     <ul>
         {% for v in recent_verifs %}
         <li><a href="{% url 'Moody:summary' view.kwargs.custname view.kwargs.id_no v.id %}">{{ v }}: {{ v.verif_descr }}</a></li>

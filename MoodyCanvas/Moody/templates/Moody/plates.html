@@ -73,17 +73,21 @@
             <li><a href="{% url 'home:index' %}" style="font-size: 18px; font-family: Courier New, Courier, monospace; margin-right: 50px;">Moody Canvas!</a></li>
             <li><a rel="dead placeholder link">Procedure</a> &raquo;</li>
             <li><a href="{% url 'Moody:index' %}">Home</a> &raquo;</li>
-            <li><a href="{% url 'Moody:customers' %}">Customers</a></li>
+            <li><a href="{% url 'Moody:customers' %}">Customers</a>{% if user.is_authenticated %} &raquo;</li>
+            <li><a href="{% url 'logout' %}">Logout</a>{% endif %}</li>
         </ul>
     </div>
 
-    {% if not plate_list %}
+{% if not plate_list %}
     <h2>No plates for {{ view.kwargs.custname }}.</h2>
+    {% if user.is_authenticated %}
     <p><a href="{% url 'Moody:new_plate' view.kwargs.custname %}">Add one</a></p>
-    {% else %}
-
+    {% endif %}
+{% else %}
     <h2>{{ view.kwargs.custname }}'s Plates</h2>
+    {% if user.is_authenticated %}
     <p><a href="{% url 'Moody:new_plate' view.kwargs.custname %}">Add a New Plate</a></p>
+    {% endif %}
     <ul>
         {% for p in plate_list %}
         <li><a href="{% url 'Moody:verifs' view.kwargs.custname p %}">{{ p }}</a></li>

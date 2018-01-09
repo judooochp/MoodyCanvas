@@ -96,9 +96,11 @@
             <li><a rel="dead placeholder link">Procedure</a> &raquo;</li>
             <li><a href="{% url 'Moody:index' %}">Home</a> &raquo;</li>
             <li><a href="{% url 'Moody:customers' %}">Customers</a> &raquo;</li>
-            <li><a href="{% url 'Moody:plates' cust %}">Plates</a></li>
+            <li><a href="{% url 'Moody:plates' cust %}">Plates</a>{% if user.is_authenticated %} &raquo;</li>
+            <li><a href="{% url 'logout' %}">Logout</a>{% endif %}</li>
         </ul>
     </div>
+{% if user.is_authenticated %}
     {% if cust %}
     <h2>Add a New Plate for {{ cust }}</h2>
     {% if plate_id %}
@@ -125,5 +127,8 @@
         <a href="{% url 'Moody:customers' %}">Browse Customers</a>
     </p>
     {% endif %}
+{% else %}
+    <h2>You are not authorized to make changes to the database.</h2>
+{% endif %}
 </body>
 </html>

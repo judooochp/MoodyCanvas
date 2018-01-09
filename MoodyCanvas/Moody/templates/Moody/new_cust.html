@@ -84,9 +84,11 @@
             <li><a href="{% url 'home:index' %}" style="font-size: 18px; font-family: Courier New, Courier, monospace; margin-right: 50px;">Moody Canvas!</a></li>
             <li><a rel="dead placeholder link">Procedure</a> &raquo;</li>
             <li><a href="{% url 'Moody:index' %}">Home</a> &raquo;</li>
-            <li><a href="{% url 'Moody:customers' %}">Customers</a></li>
+            <li><a href="{% url 'Moody:customers' %}">Customers</a>{% if user.is_authenticated %} &raquo;</li>
+            <li><a href="{% url 'logout' %}">Logout</a>{% endif %}</li>
         </ul>
     </div>
+{% if user.is_authenticated %}
     <h2>Add a Customer</h2>
     {% if cust_exists %}
     <p>{{ cust_exists }} is already in the system.<br />
@@ -98,5 +100,8 @@
         <input placeholder="Enter Customer Name" id="custname" name="custname" type="text" /><br />
         <input type="submit" />
     </form>
+{% else %}
+    <h2>You are not authorized to make edits to the database.</h2>
+{% endif %}
 </body>
 </html>

@@ -72,12 +72,15 @@
         <ul id="nav">
             <li><a href="{% url 'home:index' %}" style="font-size: 18px; font-family: Courier New, Courier, monospace; margin-right: 50px;">Moody Canvas!</a></li>
             <li><a rel="dead placeholder link">Procedure</a> &raquo;</li>
-            <li><a href="{% url 'Moody:index' %}">Home</a></li>
+            <li><a href="{% url 'Moody:index' %}">Home</a>{% if user.is_authenticated %} &raquo;</li>
+            <li><a href="{% url 'logout' %}">Logout</a>{% endif %}</li>
         </ul>
     </div>
 
     <h2>Customers</h2>
+{% if user.is_authenticated %}
     <p><a href="{% url 'Moody:new_cust' %}">Add a New Customer</a></p>
+{% endif %}
     {% if customer_list %}
     <p>View Plates For:</p>
     <ul>

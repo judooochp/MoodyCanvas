@@ -128,6 +128,7 @@
             <li><a href="{% url 'Moody:verifs' view.kwargs.custname view.kwargs.id_no %}">Verifications</a></li>
         </ul>
     </div>
+{% if user.is_authenticated %}
     <!--
         Improvements to be made:
             -show only one line at a time
@@ -503,5 +504,9 @@
         -->
     </script>
     {% endif %}
+{% else %}
+    <h2>You are not authorized to make changes to the database.</h2>
+{% endif %}
+
 </body>
 </html>
