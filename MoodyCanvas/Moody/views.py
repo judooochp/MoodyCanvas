@@ -132,7 +132,7 @@ def save_new_plate(request, custname):
             check_sn = Plate.objects.get(plate_sn=plate.plate_sn, plate_mfr=plate.plate_mfr)
         except (Plate.DoesNotExist):
             plate.save()
-            return HttpResponseRedirect(reverse('Moody:verifs', args=(custname, plate_id,)))
+            return HttpResponseRedirect(reverse('Moody:verifs', args=(custname, plate.plate_id,)))
         else:
             request.session['plate_sn'] = plate.plate_sn
             request.session['plate_mfr'] = plate.plate_mfr

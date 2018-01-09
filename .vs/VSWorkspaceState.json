@@ -3,9 +3,11 @@
     "",
     "\\MoodyCanvas",
     "\\MoodyCanvas\\home\\templates\\home",
+    "\\MoodyCanvas\\Moody",
     "\\MoodyCanvas\\MoodyCanvas",
+    "\\MoodyCanvas\\Moody\\templates",
     "\\MoodyCanvas\\Moody\\templates\\Moody"
   ],
-  "SelectedNode": "\\README.md",
+  "SelectedNode": "\\MoodyCanvas\\Moody\\templates\\Moody\\map.html",
   "PreviewInSolutionExplorer": false
 }
