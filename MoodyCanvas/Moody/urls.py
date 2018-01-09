@@ -4,7 +4,7 @@ from . import views
 
 app_name = 'Moody'
 urlpatterns = [
-    path('', views.IndexView.as_view(), name='index'),
+    path('/', views.IndexView.as_view(), name='index'),
     path('customers/', views.CustomersView.as_view(), name='customers'),
     path('new_cust/', views.new_cust, name='new_cust'),
     path('save_new_cust/', views.save_new_cust, name='save_new_cust'),

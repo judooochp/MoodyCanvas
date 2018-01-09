@@ -48,9 +48,9 @@
         <h1>Moody Canvas!</h1>
         <p>
             <div id="intro">
-                This app is a simple and unsecured surface plate asset manager and modified Moody procedure, based on that outlined in T.O. 33K6-4-137-1. Among other enhancements, perimeter margins may be chosen by the user, but mathematically convenient margins have been figured.
+                This app is a simple surface plate asset manager and modified Moody procedure, based on that outlined in T.O. 33K6-4-137-1. Among other enhancements, perimeter margins may be chosen by the user, but mathematically convenient margins have been figured.
                 <br /><br />
-                <a href="{% url 'login' %}">Get In There</a>
+                <a href="{% if user.is_authenticated %}{% url 'Moody:index' %}{% else %}{% url 'login' %}{% endif %}">Get In There</a>
             </div>
         </p>
         <div id="footer">created by Jacob Gilliam, Jan2017</div>
