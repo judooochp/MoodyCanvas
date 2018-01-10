@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '138.197.70.142', 
+    'judooochp.com',
     'localhost', 
     '0.0.0.0', ]
 
