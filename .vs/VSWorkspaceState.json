@@ -1,12 +1,15 @@
 {
   "ExpandedNodes": [
     "",
+    "\\MoodyCanvas",
+    "\\MoodyCanvas\\home",
     "\\MoodyCanvas\\home\\templates",
     "\\MoodyCanvas\\home\\templates\\home",
+    "\\MoodyCanvas\\Moody",
     "\\MoodyCanvas\\Moody\\templates",
     "\\MoodyCanvas\\Moody\\templates\\Moody",
     "\\MoodyCanvas\\Moody\\templates\\registration"
   ],
-  "SelectedNode": "\\README.md",
+  "SelectedNode": "\\MoodyCanvas\\Moody\\templates\\Moody\\plates.html",
   "PreviewInSolutionExplorer": false
 }
