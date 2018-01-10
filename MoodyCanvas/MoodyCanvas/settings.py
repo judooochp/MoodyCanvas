@@ -26,6 +26,7 @@ SECRET_KEY = 'zl63_#vicr#+qep=^!tqxf1fke(9vefb)2364hr$6q%78wy_su'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'judooochp.com',
     '138.197.70.142', 
     'localhost', 
     '0.0.0.0', ]
