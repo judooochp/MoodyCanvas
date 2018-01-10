@@ -11,7 +11,11 @@
             <div id="intro">
                 This app is a simple surface plate asset manager and modified Moody procedure, based on that outlined in T.O. 33K6-4-137-1. Among other enhancements, perimeter margins may be chosen by the user, but mathematically convenient margins have been figured.
                 <br /><br />
+                {% if user.is_authenticated %}
+                <a href="{% url 'Moody:index' %}">Get In There</a>
+                {% else %}
                 <a href="{% url 'login' %}">Get In There</a>
+                {% endif %}
             </div>
         </p>
         <div id="footer">created by Jacob Gilliam, Jan2017</div>

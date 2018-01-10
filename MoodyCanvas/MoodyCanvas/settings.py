@@ -126,5 +126,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = '/opt/Moody/MoodyCanvas/MoodyCanvas/'
 
-LOGIN_REDIRECT_URL = '/Moody/'
+LOGIN_REDIRECT_URL = '/Moody'
 LOGOUT_REDIRECT_URL = ''
