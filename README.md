@@ -23,10 +23,10 @@ Improvements to be made:
 - Aesthetic design improvements  
 - Template standardization  
 - Lightbox warnings  
-- Making live on a VPS server (done, http://138.197.70.142)  
 - Addition of Planekator procedure/app  
 - Make useful for mobile interfaces  
 - Improved workflow control  
 - Allow for date to be set by user in case of no internet at time of verification  
 - Allow for re-entry of single lines or other edits outside of admin after map rendering
   
+- Application was live. Complications have arisen.
